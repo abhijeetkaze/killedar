@@ -1,0 +1,4 @@
+-r requirements.txt
+httpx>=0.27          # starlette TestClient
+scikit-learn>=1.4    # stand-in regressor for adapter tests
+pytest>=8            # optional; tests are plain unittest

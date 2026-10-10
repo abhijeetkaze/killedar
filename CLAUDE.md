@@ -34,36 +34,43 @@ cd web
 npm install          # typescript + @types/node
 npm run check        # typecheck + tests + build  ← run before every commit
 npm test             # node --test (native TS stripping, Node ≥ 22.18)
-npm run build        # → web/dist
+npm run build        # → web/dist  (KILLEDAR_API_URL=https://… to enable predictions)
 npm run serve        # http://localhost:5173 (serves dist)
+npm run audio        # ElevenLabs narration → public/audio (needs ELEVENLABS_* env)
 
 # api
 cd api
 python -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt      # includes tabpfn (big download on first predict)
-python -m unittest discover -s tests # or: pytest
+pip install -r requirements-dev.txt          # includes tabpfn (torch; weights download on first fit)
+python -m unittest discover -s tests -t .    # ← run before every commit (pytest also works)
+python -m killedar_api.evaluation data/hikes.csv   # TabPFN vs Naismith, leave-one-out
 uvicorn killedar_api.main:app --reload --port 8000
 ```
+
+CI (`.github/workflows/ci.yml`) runs both suites on every push. Deploy: `render.yaml` blueprint.
 
 ## Layout
 
 ```
 web/src/
-  domain/    fort.ts (model + validation) · prompt.ts · plan.ts · model.ts (Gemma pick)
+  domain/    fort.ts (model + validation) · plan.ts (timing, Naismith) · prompt.ts · model.ts (Gemma pick) · chat.ts
   ports/     languageModel.ts · climbPredictor.ts · fortRepository.ts
   app/       askFort.ts · planTrek.ts
-  adapters/  webllmModel.ts · httpClimbPredictor.ts · naismithPredictor.ts · fetchFortRepository.ts
-  ui/        main.ts (composition root) · views.ts · dom.ts
-web/public/  forts/*.json · audio/*.mp3 · sw.js template · styles.css · manifest
+  adapters/  webllmModel.ts · httpClimbPredictor.ts · naismithPredictor.ts · fetchFortRepository.ts · http.ts
+  ui/        views.ts (screens) · copy.ts (all user-facing wording) · dom.ts
+  main.ts    composition root
+web/public/  forts/*.json · audio/*.mp3 · styles.css · manifest · icon
+web/scripts/ build.ts · precache.ts · sw.template.js · serve.ts · generate-audio.ts · narration.ts
 web/tests/   *.test.ts (node:test)
 
 api/killedar_api/
-  domain.py            HikeFeatures, Prediction, naismith_minutes
-  ports.py             ClimbTimeModel protocol
+  domain.py            HikeFeatures, Hike, Prediction, naismith_minutes, sane_minutes
+  ports.py             ClimbTimeModel, Regressor protocols
   adapters/            naismith_model.py · tabpfn_model.py · csv_hikes.py
+  evaluation.py        leave-one-out TabPFN vs Naismith
   app.py               create_app(model) — routes only, no wiring
-  main.py              composition root (TabPFN if installed, else Naismith)
-api/data/hikes.sample.csv  SYNTHETIC sample — replace with your own hikes
+  main.py              composition root (TabPFN if installed + enough hikes, else Naismith)
+api/data/hikes.sample.csv  SYNTHETIC (make_sample.py) — your real hikes go in data/hikes.csv
 api/tests/
 ```
 
