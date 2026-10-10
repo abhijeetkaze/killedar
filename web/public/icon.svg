@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1F2427"/>
+  <!-- Sahyadri ridge with a fort wall on the summit -->
+  <path d="M0 400 L96 300 L150 330 L232 214 L276 238 L352 150 L420 226 L512 180 L512 512 L0 512 Z" fill="#4C6B3B"/>
+  <path d="M316 176 h18 v-14 h12 v14 h12 v-14 h12 v14 h12 v-14 h12 v14 h4 l-10 30 h-70 z" fill="#9A3F22"/>
+  <path d="M0 448 C120 420 200 470 300 440 S470 410 512 430" fill="none" stroke="#ECEFEA" stroke-opacity=".35" stroke-width="6"/>
+</svg>

@@ -1,0 +1,59 @@
+{
+  "id": "sinhagad",
+  "name": "Sinhagad",
+  "nameMr": "सिंहगड",
+  "summitElevationM": 1312,
+  "travelFromPuneMin": 60,
+  "trails": [
+    {
+      "name": "Main footpath",
+      "startPoint": "Sinhagad base village (Donje / Golewadi side)",
+      "distanceKm": 2.7,
+      "elevationGainM": 600,
+      "difficulty": "moderate",
+      "note": "Most popular route. Steep in places with loose stones; very crowded on weekend mornings. Joins the top near Pune Darwaja."
+    }
+  ],
+  "water": [
+    "Dev Take, a rock-cut cistern near the top, is the traditional water source; treat or filter before drinking.",
+    "Stalls at the top sell bottled water on most days, but carry at least 2 litres for the climb."
+  ],
+  "landmarks": [
+    { "name": "Pune Darwaja", "note": "The gate facing Pune; the main footpath and the road arrive near here." },
+    { "name": "Kalyan Darwaja", "note": "Gate on the far (south-west) side of the fort, above Kalyan village." },
+    { "name": "Tanaji Malusare memorial", "note": "Memorial to Tanaji Malusare, who died capturing the fort in 1670." },
+    { "name": "Samadhi of Chhatrapati Rajaram", "note": "Rajaram Maharaj died at Sinhagad in 1700; his samadhi is on the fort." },
+    { "name": "Dev Take", "note": "Old water cistern near the top." },
+    { "name": "Food stalls", "note": "Known for pithla-bhakri, kanda bhaji and matka dahi." }
+  ],
+  "safety": [
+    "The footpath gets slippery in rain; wear shoes with grip, not sandals.",
+    "Monkeys snatch food bags — keep food zipped away.",
+    "Start descending well before sunset; the path has no lighting.",
+    "Forest department may restrict access on some days — check before leaving."
+  ],
+  "returnTransport": {
+    "note": "PMPML buses run between Swargate and the Sinhagad base area; confirm the route number and last bus time locally.",
+    "lastDepartureFromBase": null
+  },
+  "history": {
+    "en": [
+      "Sinhagad was earlier known as Kondhana.",
+      "In 1670 Tanaji Malusare led a night assault up the cliffs and won the fort for Chhatrapati Shivaji Maharaj, but was killed in the fight.",
+      "Popular tradition says Shivaji Maharaj grieved, 'Gad aala pan simha gela' — the fort is won, but the lion is lost.",
+      "Chhatrapati Rajaram Maharaj died at Sinhagad in 1700; his samadhi is on the fort.",
+      "Lokmanya Tilak had a bungalow on Sinhagad."
+    ],
+    "mr": [
+      "सिंहगडाचे जुने नाव कोंढाणा होते.",
+      "१६७० मध्ये तानाजी मालुसरे यांनी रात्रीच्या वेळी कडा चढून हा गड जिंकला, पण या लढाईत त्यांना वीरमरण आले.",
+      "\"गड आला पण सिंह गेला\" असे छत्रपती शिवाजी महाराज म्हणाले, अशी लोकप्रिय कथा आहे.",
+      "छत्रपती राजाराम महाराजांची समाधी सिंहगडावर आहे."
+    ]
+  },
+  "sources": [
+    "https://en.wikipedia.org/wiki/Sinhagad",
+    "https://en.wikipedia.org/wiki/Tanaji_Malusare"
+  ],
+  "verified": false
+}

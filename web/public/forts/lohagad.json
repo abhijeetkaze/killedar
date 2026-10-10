@@ -1,0 +1,63 @@
+{
+  "id": "lohagad",
+  "name": "Lohagad",
+  "nameMr": "लोहगड",
+  "summitElevationM": 1033,
+  "travelFromPuneMin": 90,
+  "trails": [
+    {
+      "name": "Malavli station route",
+      "startPoint": "Malavli railway station (Pune–Lonavala local)",
+      "distanceKm": 6,
+      "elevationGainM": 450,
+      "difficulty": "easy",
+      "note": "Walk past Bhaje village and up to Gaimukh Khind, the saddle between Lohagad and Visapur, then the stepped path to the gates."
+    },
+    {
+      "name": "Lohagadwadi steps",
+      "startPoint": "Lohagadwadi (road head)",
+      "distanceKm": 1,
+      "elevationGainM": 180,
+      "difficulty": "easy",
+      "note": "Short stepped climb through the four gates. Good for families."
+    }
+  ],
+  "water": [
+    "Rock-cut tanks on top; treat or filter before drinking.",
+    "Stalls at Lohagadwadi and sometimes near the gates sell water and nimbu sarbat."
+  ],
+  "landmarks": [
+    { "name": "Four gates", "note": "Ganesh, Narayan, Hanuman and Maha Darwaja, one after another on the stepped path." },
+    { "name": "Vinchu Kata", "note": "The 'scorpion's tail': a long, narrow spur on the west side with wide views." },
+    { "name": "Gaimukh Khind", "note": "Saddle between Lohagad and Visapur fort." },
+    { "name": "Bhaja Caves", "note": "Ancient Buddhist rock-cut caves above Bhaje village, on the way from Malavli." }
+  ],
+  "safety": [
+    "Very crowded on monsoon weekends; the steps get slippery and gates bottleneck.",
+    "Stay back from the Vinchu Kata edges, especially in fog.",
+    "Check the last local train back from Malavli before you start."
+  ],
+  "returnTransport": {
+    "note": "Pune–Lonavala local trains stop at Malavli; confirm the last train time towards Pune on the day.",
+    "lastDepartureFromBase": null
+  },
+  "history": {
+    "en": [
+      "Chhatrapati Shivaji Maharaj captured Lohagad in 1648.",
+      "It was handed to the Mughals under the Treaty of Purandar in 1665 and won back in 1670.",
+      "Lohagad pairs with neighbouring Visapur; together they guarded the trade route through the Bor Ghat.",
+      "The Bhaja Caves nearby are among the oldest Buddhist rock-cut caves in Maharashtra."
+    ],
+    "mr": [
+      "छत्रपती शिवाजी महाराजांनी १६४८ मध्ये लोहगड जिंकला.",
+      "१६६५ च्या पुरंदरच्या तहात तो मुघलांना द्यावा लागला आणि १६७० मध्ये पुन्हा जिंकला.",
+      "गडाच्या पश्चिमेला 'विंचूकाटा' नावाची लांब, निमुळती माची आहे.",
+      "पायथ्याजवळ भाजे येथे प्राचीन बौद्ध लेणी आहेत."
+    ]
+  },
+  "sources": [
+    "https://en.wikipedia.org/wiki/Lohagad",
+    "https://en.wikipedia.org/wiki/Bhaja_Caves"
+  ],
+  "verified": false
+}

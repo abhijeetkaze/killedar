@@ -1,0 +1,41 @@
+// Composition root: the only place adapters are chosen and wired to use cases.
+
+import { fetchFortRepository } from "./adapters/fetchFortRepository.ts";
+import { httpClimbPredictor } from "./adapters/httpClimbPredictor.ts";
+import { naismithPredictor } from "./adapters/naismithPredictor.ts";
+import { webllmModel } from "./adapters/webllmModel.ts";
+import { makeAskFort } from "./app/askFort.ts";
+import { makePlanTrek } from "./app/planTrek.ts";
+import { mountApp } from "./ui/views.ts";
+
+/** Set at build time from KILLEDAR_API_URL; empty means "no prediction service, use the rule of thumb". */
+const apiUrl = document.querySelector<HTMLMetaElement>('meta[name="killedar-api"]')?.content.trim() ?? "";
+
+const forts = fetchFortRepository("./forts/");
+const predictor = apiUrl ? httpClimbPredictor({ baseUrl: apiUrl }) : naismithPredictor;
+const model = webllmModel();
+
+let audio: Promise<Set<string>> | null = null;
+const audioFiles = () =>
+  (audio ??= fetch("./audio/index.json")
+    .then((r) => (r.ok ? (r.json() as Promise<string[]>) : []))
+    .then((list) => new Set(list))
+    .catch(() => new Set<string>()));
+
+const root = document.getElementById("app");
+if (root) {
+  mountApp(root, {
+    forts,
+    model,
+    planTrek: makePlanTrek({ forts, predictor }),
+    askFort: makeAskFort({ forts, model }),
+    audioFiles,
+  }).catch((e: unknown) => {
+    root.textContent = "Killedar couldn't start. Reload the page while online once.";
+    console.error(e);
+  });
+}
+
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  navigator.serviceWorker.register("./sw.js").catch((e: unknown) => console.warn("Service worker not registered", e));
+}

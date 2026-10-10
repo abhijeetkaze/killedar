@@ -1,0 +1,64 @@
+{
+  "id": "rajgad",
+  "name": "Rajgad",
+  "nameMr": "राजगड",
+  "summitElevationM": 1376,
+  "travelFromPuneMin": 105,
+  "trails": [
+    {
+      "name": "Pali Darwaja route",
+      "startPoint": "Pali village",
+      "distanceKm": 4,
+      "elevationGainM": 700,
+      "difficulty": "moderate",
+      "note": "Longer but steadier; wide steps near the top lead through Pali Darwaja onto Padmavati Machi."
+    },
+    {
+      "name": "Chor Darwaja route",
+      "startPoint": "Gunjavane village",
+      "distanceKm": 3,
+      "elevationGainM": 750,
+      "difficulty": "hard",
+      "note": "Steep, with rock patches and railings near Chor Darwaja. Avoid when wet or with beginners."
+    }
+  ],
+  "water": [
+    "Padmavati lake and cisterns on Padmavati Machi; treat or filter before drinking.",
+    "Few or no stalls on the way up — carry 3 litres, more in summer."
+  ],
+  "landmarks": [
+    { "name": "Padmavati Machi", "note": "Main plateau with the Padmavati temple, the lake and the old Rajsadar." },
+    { "name": "Saibai's samadhi", "note": "Samadhi of Maharani Saibai, on Padmavati Machi." },
+    { "name": "Suvela Machi", "note": "Long eastern spur; look for the natural rock arch (Nedhe)." },
+    { "name": "Sanjivani Machi", "note": "Western spur with layered fortification walls." },
+    { "name": "Balekilla", "note": "The citadel at the very top; the final climb is exposed, use the railings." }
+  ],
+  "safety": [
+    "This is a full-day climb; start early or plan to stay overnight on Padmavati Machi.",
+    "The Balekilla climb is exposed — skip it in strong wind or rain.",
+    "Phone signal is patchy on the machis; tell someone your plan before you start."
+  ],
+  "returnTransport": {
+    "note": "Limited state transport (ST) buses to the base villages via Nasrapur/Velhe; most hikers use their own vehicle. Confirm the last bus locally.",
+    "lastDepartureFromBase": null
+  },
+  "history": {
+    "en": [
+      "Rajgad was earlier called Murumbdev.",
+      "It served as the capital of Chhatrapati Shivaji Maharaj's kingdom for about 25 years before the capital moved to Raigad.",
+      "The fort has three machis (Padmavati, Suvela, Sanjivani) around a central citadel, the Balekilla.",
+      "Maharani Saibai's samadhi is on Padmavati Machi.",
+      "Chhatrapati Rajaram Maharaj was born on Rajgad in 1670."
+    ],
+    "mr": [
+      "राजगडाचे जुने नाव मुरुंबदेव होते.",
+      "राजगड सुमारे पंचवीस वर्षे छत्रपती शिवाजी महाराजांच्या स्वराज्याची राजधानी होता.",
+      "पद्मावती, सुवेळा आणि संजीवनी या तीन माच्या आणि मध्ये सर्वात वर बालेकिल्ला आहे.",
+      "महाराणी सईबाई यांची समाधी पद्मावती माचीवर आहे."
+    ]
+  },
+  "sources": [
+    "https://en.wikipedia.org/wiki/Rajgad_Fort"
+  ],
+  "verified": false
+}

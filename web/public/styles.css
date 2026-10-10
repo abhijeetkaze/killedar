@@ -1,0 +1,249 @@
+/* Killedar — built for a phone in one hand, in bright sun, with no web fonts (offline). */
+
+:root {
+  --haze: #ecefea;      /* monsoon-haze page */
+  --basalt: #1f2427;    /* ink */
+  --laterite: #9a3f22;  /* the one primary action */
+  --moss: #4c6b3b;      /* ready / offline OK */
+  --lichen: #6c746b;    /* secondary text */
+  --rock: #d9ded6;      /* fields, rules */
+  --surface: #f7f8f5;
+  --warn: #7a5a00;
+  --contour: rgba(31, 36, 39, 0.09);
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", sans-serif;
+  --font-deva: "Noto Sans Devanagari", "Mukta", "Kohinoor Devanagari", "Nirmala UI", var(--font);
+
+  /* type scale: 1.25 */
+  --s-1: 0.8rem;
+  --s0: 1rem;
+  --s1: 1.25rem;
+  --s2: 1.563rem;
+  --s3: 2.441rem;
+  --s4: clamp(3.4rem, 17vw, 5.2rem);
+
+  --gutter: 16px;
+  --radius-control: 10px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --haze: #171b1d;
+    --basalt: #e6e9e3;
+    --laterite: #d4704c;
+    --moss: #8fb173;
+    --lichen: #9aa298;
+    --rock: #2c3336;
+    --surface: #1e2427;
+    --warn: #e0b84c;
+    --contour: rgba(230, 233, 227, 0.07);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --haze: #171b1d;
+  --basalt: #e6e9e3;
+  --laterite: #d4704c;
+  --moss: #8fb173;
+  --lichen: #9aa298;
+  --rock: #2c3336;
+  --surface: #1e2427;
+  --warn: #e0b84c;
+  --contour: rgba(230, 233, 227, 0.07);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--haze);
+  color: var(--basalt);
+  font: 400 var(--s0) / 1.5 var(--font);
+}
+[lang="mr"] { font-family: var(--font-deva); line-height: 1.6; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--laterite); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.app {
+  max-width: 34rem;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.booting { padding: 2rem var(--gutter); color: var(--lichen); }
+
+/* ── masthead: the one bold thing ───────────────────────────────── */
+.masthead {
+  padding: calc(env(safe-area-inset-top) + 12px) var(--gutter) 20px;
+  /* contour lines of a ridge */
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2'%3E%3Cpath d='M0 190 C80 150 120 170 190 120 S310 60 400 90'/%3E%3Cpath d='M0 170 C70 130 130 150 195 100 S300 40 400 70'/%3E%3Cpath d='M0 150 C60 112 140 128 200 82 S290 22 400 50'/%3E%3Cpath d='M20 130 C80 100 150 108 205 64 S285 10 380 30'/%3E%3Cpath d='M60 112 C110 90 160 90 210 48 S280 0 340 14'/%3E%3C/g%3E%3C/svg%3E")
+    right bottom / 100% 100% no-repeat;
+  background-blend-mode: normal;
+  position: relative;
+}
+.masthead::after { /* tint the contour svg to the theme */
+  content: "";
+  position: absolute; inset: 0;
+  background: var(--haze);
+  opacity: 0.88;
+  pointer-events: none;
+}
+.masthead > * { position: relative; z-index: 1; }
+
+.fort-picker { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.fort-picker button {
+  border: 1.5px solid var(--rock);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 14px;
+  min-height: 40px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fort-picker button[aria-pressed="true"] { background: var(--basalt); color: var(--haze); border-color: var(--basalt); }
+
+.title h1 {
+  margin: 18px 0 0;
+  font-size: var(--s4);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.title p { margin: 6px 0 0; color: var(--lichen); }
+
+/* ── screens ────────────────────────────────────────────────────── */
+.view { flex: 1; padding: 8px var(--gutter) 96px; outline: none; }
+.screen > * + * { margin-top: 20px; }
+h2 { font-size: var(--s1); margin: 28px 0 8px; }
+.muted { color: var(--lichen); }
+.small { font-size: var(--s-1); }
+.note { color: var(--lichen); font-size: var(--s-1); }
+.error { color: var(--laterite); font-weight: 600; }
+
+/* plan result: the answer first */
+.leave { font-size: var(--s2); line-height: 1.2; margin: 8px 0 4px; }
+.leave strong { display: block; font-size: var(--s3); font-variant-numeric: tabular-nums; }
+.leave.pending { font-size: var(--s1); color: var(--lichen); }
+.estimate { margin: 0; }
+
+.timeline { list-style: none; margin: 16px 0 0; padding: 0; border-left: 2px solid var(--rock); }
+.timeline li {
+  display: grid;
+  grid-template-columns: 4.2rem 1fr;
+  gap: 8px;
+  padding: 6px 0 6px 14px;
+  position: relative;
+}
+.timeline li::before {
+  content: "";
+  position: absolute; left: -6px; top: 14px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--haze); border: 2px solid var(--basalt);
+}
+.timeline li:first-child::before, .timeline li:last-child::before { background: var(--laterite); border-color: var(--laterite); }
+.timeline time { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.warnings { margin: 16px 0 0; padding-left: 1.1rem; color: var(--warn); font-size: var(--s-1); }
+.warnings li + li { margin-top: 4px; }
+
+/* forms */
+.plan-form { display: grid; gap: 12px; padding-top: 16px; border-top: 1px solid var(--rock); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field { display: grid; gap: 4px; font-size: var(--s-1); color: var(--lichen); }
+.field > span { min-height: 2.4em; display: flex; align-items: end; }
+input, select, textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--rock);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: var(--s0);
+  color: var(--basalt);
+}
+textarea { resize: vertical; }
+
+button.primary, button.secondary {
+  min-height: 48px;
+  padding: 10px 18px;
+  border-radius: var(--radius-control);
+  font-weight: 700;
+  cursor: pointer;
+}
+button.primary { background: var(--laterite); color: #fff; border: 0; }
+button.secondary { background: transparent; color: var(--basalt); border: 1.5px solid var(--basalt); }
+button:disabled { opacity: 0.55; cursor: progress; }
+
+/* offline status */
+.offline { padding: 16px; background: var(--surface); border-radius: 14px; }
+.offline h2 { margin-top: 0; }
+.offline .ready { color: var(--moss); font-weight: 700; }
+.offline .ready::before { content: "● "; }
+progress { width: 100%; height: 8px; accent-color: var(--moss); }
+
+/* ask */
+.lang, .suggestions { display: flex; gap: 8px; flex-wrap: wrap; }
+.lang button, .suggestions button {
+  border: 1.5px solid var(--rock);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 14px;
+  min-height: 40px;
+  cursor: pointer;
+}
+.lang button[aria-pressed="true"] { border-color: var(--basalt); font-weight: 700; }
+.suggestions button { font-size: var(--s-1); text-align: left; }
+.log p { margin: 0; max-width: 60ch; }
+.log .q { font-weight: 700; margin-top: 18px; }
+.log .a { margin-top: 6px; white-space: pre-wrap; }
+.ask-form {
+  position: sticky;
+  bottom: 80px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 8px 0;
+  background: var(--haze);
+}
+
+/* listen */
+.history p { max-width: 60ch; }
+.landmarks dt { font-weight: 700; margin-top: 12px; }
+.landmarks dd { margin: 2px 0 0; color: var(--lichen); }
+.sources { padding-left: 1.1rem; font-size: var(--s-1); }
+.sources a { color: inherit; overflow-wrap: anywhere; }
+audio { width: 100%; }
+
+/* ── bottom tabs, in thumb reach ────────────────────────────────── */
+.tabbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px var(--gutter) calc(env(safe-area-inset-bottom) + 8px);
+  background: var(--haze);
+  border-top: 1px solid var(--rock);
+}
+.tabbar button {
+  flex: 1;
+  max-width: 11rem;
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  font-weight: 600;
+  color: var(--lichen);
+  cursor: pointer;
+}
+.tabbar button[aria-current="page"] { color: var(--basalt); background: var(--surface); box-shadow: inset 0 -3px 0 var(--laterite); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .log .a:empty::after { content: "…"; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+}
