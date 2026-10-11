@@ -2,6 +2,7 @@ import type { Fort } from "../src/domain/fort.ts";
 import type { ClimbEstimate, ClimbInput, ClimbPredictor } from "../src/ports/climbPredictor.ts";
 import { FortNotFoundError, type FortRepository } from "../src/ports/fortRepository.ts";
 import type { ChatMessage, LanguageModel, LoadProgress, Support } from "../src/ports/languageModel.ts";
+import type { OfflineFiles } from "../src/ports/offlineFiles.ts";
 
 export function sampleFort(overrides: Partial<Fort> = {}): Fort {
   return {
@@ -105,4 +106,46 @@ export function sampleTable(): unknown {
       { distanceKm: 2.7, elevationGainM: 600, minutes: [[1, 2], [3, 4], [5, 6]] },
     ],
   };
+}
+
+/** Fake precache: `stored` of `total` files; store() fills the rest one by one, or fails. */
+export function fakeFiles(stored: number, total: number, opts: { fail?: boolean } = {}): OfflineFiles & { kept: number } {
+  const files = {
+    kept: 0,
+    async status() {
+      return { stored, total };
+    },
+    async store(onProgress: (stored: number, total: number) => void) {
+      if (opts.fail) throw new Error("offline");
+      while (stored < total) onProgress(++stored, total);
+    },
+    async keep() {
+      files.kept++;
+      return true;
+    },
+  };
+  return files;
+}
+
+/** Fake on-device model with a controllable cache, support and download. */
+export function fakeModel(opts: { cached?: boolean; support?: Support; failLoad?: boolean } = {}): LanguageModel & { loads: number } {
+  let cached = opts.cached ?? false;
+  const model = {
+    loads: 0,
+    modelName: "fake-gemma",
+    async checkSupport(): Promise<Support> {
+      return opts.support ?? { ok: true };
+    },
+    async isCached() {
+      return cached;
+    },
+    async load(onProgress: (p: LoadProgress) => void) {
+      model.loads++;
+      if (opts.failLoad) throw new Error("network");
+      onProgress({ fraction: 0.5, text: "Fetching weights 50%" });
+      cached = true;
+    },
+    async *stream(): AsyncIterable<string> {},
+  };
+  return model;
 }

@@ -39,7 +39,7 @@ You download the trail guide once on Wi-Fi. After that, airplane mode is fine.
 
 <!-- TODO: demo video. Suggested 60–90 s shot list:
   1. Plan screen on Wi-Fi: pick Rajgad → enter last bus → "Leave Pune by 06:10" (10 s)
-  2. Tap "Download trail guide", progress bar (cut; 5 s)
+  2. Tap "Use offline" → "Download for offline": progress ring, then the green "Offline ready" check (cut; 5 s)
   3. Swipe down → airplane mode ON, clearly visible (5 s)
   4. Ask: "Is there water at the top?" → answer streams in (15 s)
   5. Switch to मराठी, ask the same → Marathi answer (15 s)

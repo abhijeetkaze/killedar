@@ -2,6 +2,7 @@
 
 import type { PlanWarning } from "../app/planTrek.ts";
 import { formatDuration } from "../domain/plan.ts";
+import type { OfflineOverall, OfflineStep, StepId } from "../domain/offline.ts";
 import type { ClimbEstimate } from "../ports/climbPredictor.ts";
 
 export function warningText(w: PlanWarning): string {
@@ -28,19 +29,46 @@ export function estimateText(e: ClimbEstimate): string {
   return `Climb about ${climb} at your pace, ${vs}.`;
 }
 
-export function downloadStatusText(state: "checking" | "unsupported" | "missing" | "downloading" | "ready" | "failed"): string {
-  switch (state) {
-    case "checking":
-      return "Checking whether the trail guide is on this phone…";
-    case "unsupported":
-      return "This browser can't run the on-device guide.";
-    case "missing":
-      return "The trail guide isn't on this phone yet. Download it on Wi-Fi before you leave.";
-    case "downloading":
-      return "Downloading the trail guide…";
+export function offlineBadgeText(overall: OfflineOverall, fraction: number, wanted: boolean): string {
+  switch (overall) {
+    case "working":
+      return `Saving ${Math.floor(fraction * 100)}%`;
     case "ready":
-      return "Ready offline. Questions work with no signal.";
+      return "Offline ready";
+    case "partial":
+      return "Finish offline";
+    case "off":
+      return wanted ? "Finish offline" : "Use offline";
+  }
+}
+
+export function offlineStepTitle(id: StepId): string {
+  return id === "files" ? "App, fort notes and your climb times" : "Gemma trail guide, for Ask";
+}
+
+export function offlineStepText(s: OfflineStep): string {
+  switch (s.status) {
+    case "done":
+      return s.id === "files" ? "Saved on this phone." : `Saved on this phone${s.detail ? ` (${s.detail})` : ""}.`;
+    case "working":
+      return s.detail || "Starting…";
+    case "missing":
+      return s.id === "files" ? "Under 1 MB." : "About 0.7–1.5 GB, once. Use Wi-Fi.";
     case "failed":
       return "Download stopped. Check your connection and try again.";
+    case "unsupported":
+      return `Ask can't run on this browser: ${s.detail} Plan and Listen still work offline.`;
+  }
+}
+
+export function offlineSummaryText(overall: OfflineOverall): string {
+  switch (overall) {
+    case "ready":
+      return "Ready for the fort. Turn on airplane mode and try it.";
+    case "working":
+      return "Keep this page open until it finishes. You can close this panel.";
+    case "partial":
+    case "off":
+      return "Save everything once on Wi-Fi. After that Killedar works with no signal.";
   }
 }

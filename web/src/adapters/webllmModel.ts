@@ -64,7 +64,12 @@ export function webllmModel(moduleUrl: string = WEBLLM_URL): LanguageModel {
       const g = gpu();
       if (!g) return { ok: false, reason: "This browser has no WebGPU. Use Chrome on Android or desktop." };
       const adapter = await g.requestAdapter();
-      if (!adapter) return { ok: false, reason: "WebGPU is present but no GPU adapter is available." };
+      if (!adapter) {
+        return {
+          ok: false,
+          reason: "WebGPU is switched off for this GPU. Use Chrome on Android, or on desktop enable chrome://flags/#enable-unsafe-webgpu.",
+        };
+      }
       f16 = adapter.features.has("shader-f16");
       return { ok: true };
     },

@@ -1,9 +1,11 @@
 // Composition root: the only place adapters are chosen and wired to use cases.
 
 import { fetchFortRepository } from "./adapters/fetchFortRepository.ts";
+import { serviceWorkerFiles } from "./adapters/serviceWorkerFiles.ts";
 import { tablePredictor } from "./adapters/tablePredictor.ts";
 import { webllmModel } from "./adapters/webllmModel.ts";
 import { makeAskFort } from "./app/askFort.ts";
+import { makeOfflineSetup } from "./app/offlineSetup.ts";
 import { makePlanTrek } from "./app/planTrek.ts";
 import { mountApp } from "./ui/views.ts";
 
@@ -25,6 +27,7 @@ if (root) {
     model,
     planTrek: makePlanTrek({ forts, predictor }),
     askFort: makeAskFort({ forts, model }),
+    offline: makeOfflineSetup({ files: serviceWorkerFiles(), model }),
     audioFiles,
   }).catch((e: unknown) => {
     root.textContent = "Killedar couldn't start. Reload the page while online once.";

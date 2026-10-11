@@ -179,11 +179,52 @@ button.primary { background: var(--laterite); color: #fff; border: 0; }
 button.secondary { background: transparent; color: var(--basalt); border: 1.5px solid var(--basalt); }
 button:disabled { opacity: 0.55; cursor: progress; }
 
-/* offline status */
-.offline { padding: 16px; background: var(--surface); border-radius: 14px; }
-.offline h2 { margin-top: 0; }
-.offline .ready { color: var(--moss); font-weight: 700; }
-.offline .ready::before { content: "● "; }
+/* offline: header badge + setup sheet */
+.title .subtitle { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.title .subtitle p { margin: 0; }
+.icon { display: inline-flex; flex: none; }
+.offline-badge {
+  flex: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px;
+  padding: 6px 12px 6px 10px;
+  border: 1.5px solid var(--basalt);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--basalt);
+  font-size: var(--s-1);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.offline-badge.ready { border-color: var(--moss); color: var(--moss); }
+.offline-badge.working { border-color: var(--moss); }
+.offline-badge.working .icon { color: var(--moss); }
+
+.offline-sheet {
+  width: min(32rem, calc(100vw - 2 * var(--gutter)));
+  max-height: calc(100dvh - 32px);
+  padding: 20px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--haze);
+  color: var(--basalt);
+}
+.offline-sheet::backdrop { background: rgba(0, 0, 0, 0.45); }
+.offline-sheet h2 { margin: 0 0 8px; font-size: var(--s2); line-height: 1.2; }
+.offline-summary { margin: 0; color: var(--lichen); display: flex; gap: 8px; align-items: start; }
+.offline-summary.ready { padding: 12px; border-radius: 12px; background: var(--surface); color: var(--moss); font-weight: 700; }
+.offline-steps { list-style: none; margin: 16px 0; padding: 0; display: grid; gap: 10px; }
+.offline-steps li {
+  display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+  padding: 12px; border-radius: 12px; background: var(--surface);
+}
+.offline-steps li > div { display: grid; gap: 4px; min-width: 0; }
+.offline-steps .small { color: var(--lichen); overflow-wrap: anywhere; }
+.offline-steps .done .icon, .offline-steps .working .icon { color: var(--moss); }
+.offline-steps .failed .icon, .offline-steps .unsupported .icon { color: var(--warn); }
+.offline-actions { display: grid; gap: 8px; }
 progress { width: 100%; height: 8px; accent-color: var(--moss); }
 
 /* ask */

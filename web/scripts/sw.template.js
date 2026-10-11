@@ -3,7 +3,7 @@
 //   app shell, fort data, audio  → precached at install, cache-first (works in airplane mode)
 //   WebLLM module from the CDN   → stale-while-revalidate (cached on first online visit)
 //   model weights                → left to WebLLM, which stores them in its own Cache Storage
-//   prediction API               → network only; the app falls back to the rule of thumb
+//   TabPFN climb times           → predictions.json, precached with the shell
 
 const VERSION = "__VERSION__";
 const PRECACHE = __PRECACHE__;
@@ -29,6 +29,36 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// The page's offline setup asks how much of the precache is stored, and to fill any gaps
+// (e.g. a file evicted, or the install interrupted). Replies go back over the MessageChannel.
+self.addEventListener("message", (event) => {
+  const port = event.ports[0];
+  if (!port) return;
+  if (event.data === "offline-status") event.waitUntil(reportStatus(port));
+  else if (event.data === "offline-store") event.waitUntil(storeAll(port));
+});
+
+async function reportStatus(port) {
+  const cache = await caches.open(SHELL);
+  let stored = 0;
+  for (const url of PRECACHE) if (await cache.match(url)) stored++;
+  port.postMessage({ type: "done", stored, total: PRECACHE.length });
+}
+
+async function storeAll(port) {
+  try {
+    const cache = await caches.open(SHELL);
+    let stored = 0;
+    for (const url of PRECACHE) {
+      if (!(await cache.match(url))) await cache.add(url);
+      port.postMessage({ type: "progress", stored: ++stored, total: PRECACHE.length });
+    }
+    port.postMessage({ type: "done", stored, total: PRECACHE.length });
+  } catch (err) {
+    port.postMessage({ type: "error", message: String(err) });
+  }
+}
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
@@ -39,7 +69,7 @@ self.addEventListener("fetch", (event) => {
   } else if (CDN_HOSTS.includes(url.hostname)) {
     event.respondWith(staleWhileRevalidate(req));
   }
-  // everything else (API, model weights) goes straight to the network
+  // everything else (model weights) goes straight to the network; WebLLM caches those itself
 });
 
 async function shellFirst(req) {

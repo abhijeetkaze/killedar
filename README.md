@@ -53,8 +53,8 @@ pip install -r requirements-dev.txt
 python -m unittest discover -s tests -t .
 ```
 
-On a phone: open the deployed site in Chrome on Wi-Fi → Plan → **Download trail guide** →
-switch to airplane mode → Ask.
+On a phone: open the deployed site in Chrome on Wi-Fi → tap **Use offline** (top right) →
+**Download for offline** → wait for the green check → switch to airplane mode → Ask.
 
 ### Your own hikes
 

@@ -1,20 +1,23 @@
 // Screens. Talks only to use cases and ports handed in by main.ts (the composition root).
 
 import type { makeAskFort } from "../app/askFort.ts";
+import type { makeOfflineSetup } from "../app/offlineSetup.ts";
 import type { makePlanTrek, TrekPlan } from "../app/planTrek.ts";
 import type { Fort, FortSummary, Lang } from "../domain/fort.ts";
 import { formatClock } from "../domain/plan.ts";
 import { EmptyQuestionError } from "../domain/prompt.ts";
 import type { FortRepository } from "../ports/fortRepository.ts";
 import type { LanguageModel } from "../ports/languageModel.ts";
-import { downloadStatusText, estimateText, warningText } from "./copy.ts";
+import { estimateText, warningText } from "./copy.ts";
 import { h, prefs, replace } from "./dom.ts";
+import { offlineControls, type OfflineControls } from "./offline.ts";
 
 export interface AppDeps {
   forts: FortRepository;
   model: LanguageModel;
   planTrek: ReturnType<typeof makePlanTrek>;
   askFort: ReturnType<typeof makeAskFort>;
+  offline: ReturnType<typeof makeOfflineSetup>;
   /** File names present under audio/, e.g. "sinhagad-mr.mp3". */
   audioFiles: () => Promise<Set<string>>;
 }
@@ -37,6 +40,7 @@ export async function mountApp(root: HTMLElement, deps: AppDeps): Promise<void> 
     lang: (prefs.get("lang") === "mr" ? "mr" : "en") as Lang,
   };
 
+  const offline = offlineControls(deps.offline);
   const header = h("header", { class: "masthead" });
   const view = h("main", { class: "view", id: "view", tabindex: "-1" });
   const nav = h("nav", { class: "tabbar", "aria-label": "Screens" });
@@ -44,7 +48,7 @@ export async function mountApp(root: HTMLElement, deps: AppDeps): Promise<void> 
 
   async function render(): Promise<void> {
     const fort = await deps.forts.get(state.fortId);
-    replace(header, fortPicker(list, state.fortId, select), titleBlock(fort));
+    replace(header, fortPicker(list, state.fortId, select), titleBlock(fort, offline.badge));
     replace(
       nav,
       ...TABS.map((t) =>
@@ -52,7 +56,11 @@ export async function mountApp(root: HTMLElement, deps: AppDeps): Promise<void> 
       ),
     );
     const screen =
-      state.tab === "plan" ? planScreen(fort, deps) : state.tab === "ask" ? askScreen(fort, deps, state.lang, setLang) : listenScreen(fort, deps, state.lang, setLang);
+      state.tab === "plan"
+        ? planScreen(fort, deps)
+        : state.tab === "ask"
+          ? askScreen(fort, deps, offline, state.lang, setLang)
+          : listenScreen(fort, deps, state.lang, setLang);
     replace(view, screen);
   }
 
@@ -87,12 +95,12 @@ function fortPicker(list: FortSummary[], current: string, onSelect: (id: string)
   );
 }
 
-function titleBlock(fort: Fort): HTMLElement {
+function titleBlock(fort: Fort, badge: HTMLElement): HTMLElement {
   return h(
     "div",
     { class: "title" },
     h("h1", { lang: "mr" }, fort.nameMr),
-    h("p", {}, `${fort.name}, ${fort.summitElevationM.toLocaleString("en-IN")} m`),
+    h("div", { class: "subtitle" }, h("p", {}, `${fort.name}, ${fort.summitElevationM.toLocaleString("en-IN")} m`), badge),
   );
 }
 
@@ -144,7 +152,7 @@ function planScreen(fort: Fort, deps: AppDeps): HTMLElement {
   );
 
   void plan();
-  return h("div", { class: "screen" }, result, form, offlinePanel(deps.model), h("p", { class: "note" }, fort.returnTransport.note));
+  return h("div", { class: "screen" }, result, form, h("p", { class: "note" }, fort.returnTransport.note));
 }
 
 function planResult(p: TrekPlan): HTMLElement {
@@ -173,43 +181,6 @@ function planResult(p: TrekPlan): HTMLElement {
   );
 }
 
-function offlinePanel(model: LanguageModel): HTMLElement {
-  const status = h("p", {});
-  const detail = h("p", { class: "muted small" });
-  const bar = h("progress", { max: "1", value: "0", hidden: true });
-  const button = h("button", { type: "button", class: "secondary", hidden: true }, "Download trail guide");
-
-  const set = (s: Parameters<typeof downloadStatusText>[0], extra = "") => {
-    status.textContent = downloadStatusText(s);
-    status.className = s === "ready" ? "ready" : "";
-    detail.textContent = extra;
-    button.hidden = s !== "missing" && s !== "failed";
-    bar.hidden = s !== "downloading";
-  };
-
-  button.addEventListener("click", async () => {
-    set("downloading");
-    try {
-      await model.load((p) => {
-        bar.value = p.fraction;
-        detail.textContent = p.text;
-      });
-      set("ready", model.modelName);
-    } catch (e) {
-      set("failed", errorText(e));
-    }
-  });
-
-  set("checking");
-  void (async () => {
-    const support = await model.checkSupport();
-    if (!support.ok) return set("unsupported", support.reason);
-    set((await model.isCached()) ? "ready" : "missing", "A large one-time download. Use Wi-Fi.");
-  })();
-
-  return h("section", { class: "offline", "aria-label": "Offline guide" }, h("h2", {}, "On the fort"), status, bar, detail, button);
-}
-
 // ── ask ─────────────────────────────────────────────────────────────────────
 
 const SUGGESTIONS: Record<Lang, string[]> = {
@@ -217,7 +188,7 @@ const SUGGESTIONS: Record<Lang, string[]> = {
   mr: ["पाणी कुठे मिळेल?", "वर काय पाहावे?", "या गडाचा इतिहास काय आहे?"],
 };
 
-function askScreen(fort: Fort, deps: AppDeps, lang: Lang, setLang: (l: Lang) => void): HTMLElement {
+function askScreen(fort: Fort, deps: AppDeps, offline: OfflineControls, lang: Lang, setLang: (l: Lang) => void): HTMLElement {
   const log = h("div", { class: "log", "aria-live": "polite" });
   const input = h("textarea", { name: "q", rows: "2", placeholder: `Ask about ${fort.name}`, maxlength: "500", lang });
   const submit = h("button", { type: "submit", class: "primary" }, "Ask");
@@ -230,7 +201,8 @@ function askScreen(fort: Fort, deps: AppDeps, lang: Lang, setLang: (l: Lang) => 
       const support = await deps.model.checkSupport();
       if (!support.ok) throw new UserFacing(support.reason);
       if (!(await deps.model.isCached())) {
-        throw new UserFacing("The trail guide isn't on this phone yet. Download it from the Plan screen on Wi-Fi.");
+        offline.open();
+        throw new UserFacing("The trail guide isn't on this phone yet. Tap “Use offline” at the top, on Wi-Fi.");
       }
       await deps.model.load((p) => (answer.textContent = `Waking up the guide… ${Math.round(p.fraction * 100)}%`));
       answer.textContent = "";
