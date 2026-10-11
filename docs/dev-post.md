@@ -79,9 +79,16 @@ dependencies**: TypeScript compiles straight to ES modules and there's no bundle
 Which Gemma? That depends on the phone, so the choice is a small pure function. It takes the newest
 generation that fits under ~2.6B parameters, uses q4f16 if the GPU supports `shader-f16` (half
 the memory of q4f32), and avoids WebLLM's `-1k` builds, because the fort notes plus the question
-don't fit in 1,024 tokens. On a phone with f16 support that lands on **Gemma 3 1B (q4f16), about
-700 MB of VRAM**. Without f16 it falls back to Gemma 2 2B in q4f32. I tested the picker against the
-real model list WebLLM ships, not a hand-written one.
+don't fit in 1,024 tokens. I tested the picker against the real model list WebLLM ships, not a
+hand-written one.
+
+My first pick was **Gemma 3 1B**: newest and smallest, a 600 MB download. It loaded, and then
+answered "What happened here in history?" with "- Sinhagad" fifty times. Gemma 3 mixes
+512-token local-attention layers with global ones, and WebLLM 0.2 can give the model only one
+attention window. Switch it off and the local layers read the whole ~2,000-token fort prompt they
+were never trained on; switch it on and every layer forgets the fort notes after 512 tokens.
+So Killedar runs **Gemma 2 2B (q4f16, about 1.5 GB, once)**, whose local window equals its context.
+A bigger download, but answers you can trust on a mountain.
 
 Small models make things up, so the prompt is built to keep the answers short and true:
 
@@ -176,7 +183,7 @@ for climbing them should too.
 
 ## Prize Categories
 
-- **Best Use of Gemma**: Gemma 3 1B / Gemma 2 2B runs entirely on the phone via WebLLM and
+- **Best Use of Gemma**: Gemma 2 2B runs entirely on the phone via WebLLM and
   answers questions offline in English and Marathi, grounded in cited fort notes.
 - **Best Use of TabPFN**: a personal climb-time model fitted in-context on a few dozen of my own
   hikes, evaluated leave-one-out against Naismith's rule (numbers above), and precomputed so its

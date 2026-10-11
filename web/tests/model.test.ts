@@ -36,8 +36,13 @@ describe("pickGemmaModel", () => {
     assert.equal(pickGemmaModel(list, { supportsF16: false }), "gemma-2-2b-it-q4f32_1-MLC");
   });
 
-  it("prefers a newer generation even if smaller", () => {
-    assert.equal(pickGemmaModel([...list, "gemma-3-1b-it-q4f16_1-MLC"]), "gemma-3-1b-it-q4f16_1-MLC");
+  it("skips Gemma 3, which WebLLM 0.2 can't run with a long prompt", () => {
+    assert.equal(pickGemmaModel([...list, "gemma3-1b-it-q4f16_1-MLC"]), "gemma-2-2b-it-q4f16_1-MLC");
+    assert.equal(pickGemmaModel(["gemma3-1b-it-q4f16_1-MLC"]), null);
+  });
+
+  it("prefers a newer supported generation even if smaller", () => {
+    assert.equal(pickGemmaModel(["gemma-2b-it-q4f16_1-MLC", "gemma-2-2b-it-q4f16_1-MLC"]), "gemma-2-2b-it-q4f16_1-MLC");
   });
 
   it("prefers the full context window over WebLLM's -1k builds", () => {
@@ -52,8 +57,6 @@ describe("pickGemmaModel", () => {
 
 describe("gemmaChatOptions", () => {
   it("asks for a full context window and switches the engine-level sliding window off", () => {
-    // WebLLM 0.2 rejects gemma3-1b when both are positive (its config has 8192 and 512).
-    assert.deepEqual(gemmaChatOptions("gemma3-1b-it-q4f16_1-MLC"), { context_window_size: 4096, sliding_window_size: -1 });
     assert.deepEqual(gemmaChatOptions("gemma-2-2b-it-q4f32_1-MLC"), { context_window_size: 4096, sliding_window_size: -1 });
   });
 

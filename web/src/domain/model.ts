@@ -23,14 +23,22 @@ export interface PickOptions {
 }
 
 /**
- * Picks the best Gemma for a phone: newest generation, then the largest that fits under
+ * Gemma 3 mixes 512-token local-attention layers with global ones. WebLLM 0.2 can only give the
+ * whole model one KV window: with it off, the local layers see the full ~2k-token fort prompt they
+ * were never trained on and the output degenerates ("- Sinhagad" repeated); with it on, every layer
+ * sees only the last 512 tokens and the fort notes are cut off. Skip it until WebLLM supports that.
+ */
+export const UNSUPPORTED_GENERATIONS: readonly number[] = [3];
+
+/**
+ * Picks the best Gemma for a phone: newest supported generation, then the largest that fits under
  * MAX_PARAMS_B, preferring q4f16 (half the memory of q4f32), then the full context window
  * over WebLLM's "-1k" builds (fort facts + chat history overflow 1024 tokens). Null if none fit.
  */
 export function pickGemmaModel(availableIds: readonly string[], opts: PickOptions = { supportsF16: true }): string | null {
   const candidates = availableIds
     .map(describeGemma)
-    .filter((c): c is ModelChoice => c !== null && c.paramsB <= MAX_PARAMS_B)
+    .filter((c): c is ModelChoice => c !== null && c.paramsB <= MAX_PARAMS_B && !UNSUPPORTED_GENERATIONS.includes(c.generation))
     .filter((c) => opts.supportsF16 || !/f16/i.test(c.id));
   if (candidates.length === 0) return null;
   const score = (c: ModelChoice): [number, number, number, number] => [
@@ -56,11 +64,10 @@ export interface GemmaChatOptions {
 export const CONTEXT_TOKENS = 4096;
 
 /**
- * Engine options WebLLM merges over the model's mlc-chat-config.json. Gemma 3's config sets both a
- * context window and a 512-token sliding window, and WebLLM 0.2 refuses to load when both are
- * positive (WindowSizeConfigurationError). The 512 is Gemma 3's per-layer local attention, which the
- * compiled model reads from its own model_config; the engine-level KV cache needs only the context
- * window, so switch the engine-level sliding window off.
+ * Engine options WebLLM merges over the model's mlc-chat-config.json: a full context window and no
+ * engine-wide sliding window. Gemma 2's local attention window (4096) equals its context, so this
+ * is its own config made explicit; it also stops WebLLM rejecting configs that set both
+ * (WindowSizeConfigurationError).
  */
 export function gemmaChatOptions(modelId: string): GemmaChatOptions {
   return { context_window_size: /-1k$/i.test(modelId) ? 1024 : CONTEXT_TOKENS, sliding_window_size: -1 };

@@ -53,13 +53,13 @@ export function offlineStepText(s: OfflineStep): string {
     case "working":
       return s.detail || "Starting…";
     case "missing":
-      return s.id === "files" ? "Under 1 MB." : "About 0.7–1.5 GB, once. Use Wi-Fi.";
+      return s.id === "files" ? "Under 1 MB." : "About 1.5 GB, once. Use Wi-Fi.";
     case "failed":
       return "Download stopped. Check your connection and try again.";
     case "no-space":
       return s.id === "files"
         ? "This phone is out of storage for the app. Free some space, then try again."
-        : "Not enough storage for the guide. Free up about 1.5 GB (and don't use a private/incognito window), then try again. What's downloaded so far is kept.";
+        : "Not enough storage for the guide. Free up about 2 GB (and don't use a private/incognito window), then try again. What's downloaded so far is kept.";
     case "unsupported":
       return `Ask can't run on this browser: ${s.detail} Plan and Listen still work offline.`;
   }
