@@ -5,12 +5,12 @@ tags: devchallenge, hf26challenge, opensource, ai
 cover_image: <!-- TODO: trek photo URL (upload to DEV first) -->
 ---
 
-*This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 1: Touch Grass](https://dev.to/challenges/hacktoberfest-week1-2026-10-05).*
+*This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 1: Touch Grass](https://dev.to/challenges/hacktoberfest-week1-2026-10-05)*
+
+## What I Built
 
 <!-- TODO: trek photo — you on/near the fort, ideally with the phone visible -->
 ![On top of <FORT>, no bars](PHOTO_URL)
-
-## What I Built
 
 Halfway up Rajgad the bars on your phone go one by one. By Padmavati Machi you're carrying a
 very expensive torch.
@@ -42,14 +42,14 @@ it's ready. After that, airplane mode is fine.
 on Sinhagad to regulars on Rajgad, and loses signal somewhere on the way up.
 
 **How it gets you off the screen:** everything in Killedar is built to be put away quickly. Plan
-takes a minute the night before and gives you one time to remember, *leave Pune by 06:10*. On the
+takes a minute the night before and gives you one time to remember: *Leave Pune by 10:48*. On the
 fort, a question gets an answer of about 80 words, and the history plays aloud while you look at the
 walls. The best session is a short one.
 
 ## Demo
 
 <!-- TODO: demo video. Suggested 60–90 s shot list:
-  1. Plan screen on Wi-Fi: pick Rajgad → enter last bus → "Leave Pune by 06:10" (10 s)
+  1. Plan screen on Wi-Fi: pick Rajgad → enter last bus → "Leave Pune by …" (10 s)
   2. Tap "Use offline" → "Download for offline": progress ring, then the green "Offline ready" check (cut; 5 s)
   3. Swipe down → airplane mode ON, clearly visible (5 s)
   4. Ask: "Is there water on Padmavati Machi?" → answer streams in (15 s)
@@ -58,8 +58,18 @@ walls. The best session is a short one.
 -->
 {% embed VIDEO_URL %}
 
-**Try it:** [killedar.onrender.com](https://killedar.onrender.com). Plan and Listen work in any
-modern browser. Ask needs WebGPU: Chrome on Android, or desktop Chrome with a supported GPU.
+**Live app: [killedar.onrender.com](https://killedar.onrender.com)**. Open it on your phone, tap
+**Use offline**, then try it in airplane mode. Plan and Listen work in any modern browser. Ask
+needs WebGPU: Chrome on Android, or desktop Chrome with a supported GPU.
+
+![Killedar on a phone: Plan, offline setup, Listen](https://raw.githubusercontent.com/abhijeetkaze/killedar/main/docs/screenshots/killedar-screens.png)
+*Left: Plan for Rajgad, working back from a last bus of 18:30 (an example; the app never guesses bus
+times) with TabPFN's predicted climb time. Middle: the one-time offline setup, mid-way through
+downloading Gemma. Right: Listen, playing the ElevenLabs narration in Marathi.*
+
+<!-- TODO: screenshot from your phone of Ask answering in airplane mode (English or Marathi):
+![Ask answering offline on Rajgad](ASK_SCREENSHOT_URL)
+*Gemma 2 2B answering on the phone, in airplane mode.* -->
 
 ## Code
 
@@ -215,11 +225,10 @@ it, add Harishchandragad, correct my Marathi, and ship their own version without
 permission or paying for anyone's API. Forts were built to stand on their own when cut off. The tool
 for climbing them should too.
 
-<!-- OPTIONAL — "My Agent Session": the page encourages saving your build session with DevRelay and
-embedding it here; judges find it helpful. Delete this comment if you skip it.
 ## My Agent Session
-{% embed DEVRELAY_URL %}
--->
+
+<!-- Optional, but judges love it. Save your session with DevRelay and embed it with the
+agent_session tag (see the challenge page), or link to it. If you skip it, delete this whole section. -->
 
 ## Prize Categories
 
@@ -244,4 +253,4 @@ embedding it here; judges find it helpful. Delete this comment if you skip it.
 ---
 
 *Built solo in Pune, October 2026. Fort data is unverified. Check locally before you climb, and
-send corrections.* <!-- TODO: team/credits line if anyone helped -->
+send corrections.*
