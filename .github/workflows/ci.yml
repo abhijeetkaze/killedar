@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.12"
       # tabpfn (torch) is skipped in CI to keep it fast; its test is marked skipUnless.
-      - run: pip install starlette uvicorn "pydantic>=2.7" httpx scikit-learn
+      - run: pip install "pydantic>=2.7" scikit-learn
       - run: python -m unittest discover -s tests -t . -v
 
   # The real TabPFN model: CPU torch + open v2 weights from Hugging Face. Slower, so separate.
@@ -51,5 +51,6 @@ jobs:
           key: tabpfn-v2-weights
       - run: pip install -r requirements-dev.txt
       - run: python -c "import tabpfn" # fail loudly here, never silently skip below
-      - run: python -m unittest tests.test_models -v
-      - run: python -m killedar_api.evaluation data/hikes.sample.csv
+      - run: python -m unittest tests.test_precompute tests.test_models -v
+      - run: python -m killedar_api.evaluation data/hikes.csv
+      - run: python -m killedar_api.precompute data/hikes.csv "$RUNNER_TEMP/predictions.json"

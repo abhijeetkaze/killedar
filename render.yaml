@@ -1,31 +1,13 @@
-# Render Blueprint: the PWA as a static site + the prediction API as a web service.
+# Render Blueprint: the PWA as a static site. That's the whole deployment — Gemma runs on the
+# phone, and TabPFN's predictions are precomputed into web/public/predictions.json.
 # Deploy: Render dashboard → New → Blueprint → pick this repo.
 services:
-  - type: web
-    name: killedar-api
-    runtime: python
-    rootDir: api
-    plan: free # TabPFN + torch on CPU may need more than 512 MB; move to "starter" if it restarts
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn killedar_api.main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
-    envVars:
-      - key: PYTHON_VERSION
-        value: "3.12.7"
-      - key: KILLEDAR_ALLOWED_ORIGINS
-        value: https://killedar.onrender.com
-      - key: HIKES_CSV
-        value: data/hikes.csv # commit your own hikes here; falls back to Naismith if missing
-
   - type: web
     name: killedar
     runtime: static
     rootDir: web
     buildCommand: npm install && npm run build
     staticPublishPath: dist
-    envVars:
-      - key: KILLEDAR_API_URL
-        value: https://killedar-api.onrender.com
     headers:
       - path: /sw.js
         name: Cache-Control

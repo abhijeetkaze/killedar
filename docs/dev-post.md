@@ -1,7 +1,7 @@
 ---
 title: "Killedar: a fort guide that works where the signal dies"
 published: false
-tags: devchallenge, hacktoberfestchallenge, opensource, ai
+tags: devchallenge, hf26challenge, opensource, ai
 cover_image: <!-- TODO: trek photo URL (upload to DEV first) -->
 ---
 
@@ -47,24 +47,26 @@ You download the trail guide once on Wi-Fi. After that, airplane mode is fine.
 -->
 {% embed VIDEO_URL %}
 
-**Try it:** [killedar.onrender.com](https://killedar.onrender.com) <!-- TODO: confirm final URL -->.
+**Try it:** [killedar.onrender.com](https://killedar.onrender.com).
 Use Chrome on Android or desktop; Ask needs WebGPU.
 
 ## Code
 
 {% github abhijeetkaze/killedar %}
 
-Two halves, both ports-and-adapters with a pure domain at the centre:
+A static PWA and a bit of Python I run on my laptop. **There is no backend.** Both halves are
+ports-and-adapters with a pure domain at the centre:
 
 ```
-web/  PWA, zero runtime deps          api/  Starlette, online-only, optional
-  domain   timing, prompt, model pick   domain    features, Naismith baseline
-  ports    LanguageModel, Predictor     ports     ClimbTimeModel
-  app      planTrek, askFort            adapters  TabPFN, CSV, Naismith
-  adapters WebLLM (Gemma), HTTP, data   app       /predict, /health
+web/  PWA, zero runtime deps             api/  Python tooling, not a server
+  domain   timing, prompt, model pick      domain     features, Naismith baseline
+  ports    LanguageModel, Predictor        adapters   TabPFN, hikes CSV, fort trails
+  app      planTrek, askFort               evaluation leave-one-out vs Naismith
+  adapters WebLLM (Gemma), table, data     precompute → web/public/predictions.json
 ```
 
-<!-- TODO: update counts if they change --> 73 web tests and 30 API tests. CI runs both on every push.
+<!-- TODO: update counts if they change --> 75 web tests and 23 Python tests. CI runs both on every
+push, including the real TabPFN model.
 
 ## How I Built It
 
@@ -118,9 +120,21 @@ The evaluation is leave-one-out, so each hike is predicted by a model that never
 <!-- TODO: one honest sentence interpreting it, e.g. "Naismith thinks I'm faster than I am on steep
 ground; TabPFN noticed." If TabPFN didn't win, say so; that's a result too. -->
 
-The API is deliberately **optional**. Prediction happens at home while you plan. If the service is
-down or you're offline, the Plan screen falls back to Naismith locally and tells you so. It never
-blocks.
+My first version served TabPFN from a small web API. It worked, but it was the wrong shape twice
+over. It needed signal, which is the one thing this app can't assume. And PyTorch plus TabPFN sat
+right at the 512 MB limit of a free instance, so every prediction knocked the server over.
+
+The fix was to notice how small the question space is. The app only ever asks about its own
+trails, at a start hour between 4 and 14 and a group of 1 to 30. That's about 1,650 questions.
+So TabPFN answers **all of them ahead of time**, on my laptop, in about 13 seconds:
+
+```bash
+python -m killedar_api.precompute data/hikes.csv   # → web/public/predictions.json (7 KB)
+```
+
+The service worker caches that file with the app shell. The Plan screen looks up *my* climb time in
+about 20 ms, online or on the summit, and anything outside the table falls back to Naismith.
+TabPFN still does the learning; the phone just reads its answers.
 
 ### Facts about real places
 
@@ -138,8 +152,8 @@ phone's own speech synthesis.
 
 ### Deploy
 
-One `render.yaml` blueprint deploys both halves to Render: the PWA as a static site and the
-prediction API as a Python web service.
+One `render.yaml` blueprint deploys the PWA to Render as a static site. That's the whole
+deployment: Gemma runs on the phone, and TabPFN's answers ship in a 7 KB file.
 
 ## Why Does Open Innovation Matter?
 
@@ -151,7 +165,7 @@ an **artifact**: once they're on the phone, nobody can switch them off, rate-lim
 per question.
 
 Running on the device also keeps things private. My hike history (where I go, when, how slowly)
-trains a model on my own server and goes nowhere else. Questions asked on the fort never leave the
+goes into TabPFN on my own laptop, and only the predicted minutes ship with the app. Questions asked on the fort never leave the
 phone at all.
 
 It also matters who gets to build. Everything in Killedar is open: Gemma's weights, WebLLM's
@@ -162,14 +176,13 @@ for climbing them should too.
 
 ## Prize Categories
 
-<!-- TODO: match the exact category names on the challenge page -->
-
 - **Best Use of Gemma**: Gemma 3 1B / Gemma 2 2B runs entirely on the phone via WebLLM and
   answers questions offline in English and Marathi, grounded in cited fort notes.
 - **Best Use of TabPFN**: a personal climb-time model fitted in-context on a few dozen of my own
-  hikes, evaluated leave-one-out against Naismith's rule (numbers above).
-- **Best Use of Render**: one `render.yaml` blueprint deploys the PWA (static site) and the
-  TabPFN API (web service).
+  hikes, evaluated leave-one-out against Naismith's rule (numbers above), and precomputed so its
+  predictions work offline on the fort.
+- **Best Use of Render**: Render hosts the app's front end, a static site deployed from one
+  `render.yaml` blueprint. All the AI runs on the phone.
 - **Best Use of ElevenLabs**: fort histories narrated at build time and bundled offline, so they
   play on the summit with no signal. <!-- TODO: remove if no audio -->
 
