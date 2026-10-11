@@ -21,8 +21,11 @@ class NotEnoughHikesError(ValueError):
 def default_regressor() -> Regressor:
     # Imported lazily: tabpfn pulls in torch and downloads weights on first use.
     from tabpfn import TabPFNRegressor  # type: ignore[import-not-found]
+    from tabpfn.constants import ModelVersion  # type: ignore[import-not-found]
 
-    return TabPFNRegressor(device="cpu")
+    # tabpfn >= 2.5 defaults to gated weights that need a TABPFN_TOKEN and a license click-through.
+    # v2 is the one version with an open direct download, so it works on Render and in CI unattended.
+    return TabPFNRegressor.create_default_for_version(ModelVersion.V2, device="cpu")
 
 
 class TabPFNModel:
