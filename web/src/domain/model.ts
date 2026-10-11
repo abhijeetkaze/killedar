@@ -24,7 +24,8 @@ export interface PickOptions {
 
 /**
  * Picks the best Gemma for a phone: newest generation, then the largest that fits under
- * MAX_PARAMS_B, preferring q4f16 (half the memory of q4f32). Returns null if none fit.
+ * MAX_PARAMS_B, preferring q4f16 (half the memory of q4f32), then the full context window
+ * over WebLLM's "-1k" builds (fort facts + chat history overflow 1024 tokens). Null if none fit.
  */
 export function pickGemmaModel(availableIds: readonly string[], opts: PickOptions = { supportsF16: true }): string | null {
   const candidates = availableIds
@@ -32,15 +33,16 @@ export function pickGemmaModel(availableIds: readonly string[], opts: PickOption
     .filter((c): c is ModelChoice => c !== null && c.paramsB <= MAX_PARAMS_B)
     .filter((c) => opts.supportsF16 || !/f16/i.test(c.id));
   if (candidates.length === 0) return null;
-  const score = (c: ModelChoice): [number, number, number] => [
+  const score = (c: ModelChoice): [number, number, number, number] => [
     c.generation,
     c.paramsB,
     /q4f16/i.test(c.id) ? 1 : 0,
+    /-1k$/i.test(c.id) ? 0 : 1,
   ];
   candidates.sort((a, b) => {
-    const [ga, pa, qa] = score(a);
-    const [gb, pb, qb] = score(b);
-    return gb - ga || pb - pa || qb - qa;
+    const [ga, pa, qa, ka] = score(a);
+    const [gb, pb, qb, kb] = score(b);
+    return gb - ga || pb - pa || qb - qa || kb - ka;
   });
   return candidates[0]?.id ?? null;
 }

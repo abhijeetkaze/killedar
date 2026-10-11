@@ -40,6 +40,11 @@ describe("pickGemmaModel", () => {
     assert.equal(pickGemmaModel([...list, "gemma-3-1b-it-q4f16_1-MLC"]), "gemma-3-1b-it-q4f16_1-MLC");
   });
 
+  it("prefers the full context window over WebLLM's -1k builds", () => {
+    const ids = ["gemma-2-2b-it-q4f32_1-MLC-1k", "gemma-2-2b-it-q4f32_1-MLC"];
+    assert.equal(pickGemmaModel(ids, { supportsF16: false }), "gemma-2-2b-it-q4f32_1-MLC");
+  });
+
   it("returns null when no Gemma is listed", () => {
     assert.equal(pickGemmaModel(["Llama-3.2-1B-Instruct-q4f16_1-MLC"]), null);
   });
