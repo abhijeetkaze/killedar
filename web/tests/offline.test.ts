@@ -80,10 +80,16 @@ describe("offlineSetup", () => {
     assert.equal(model.loads, 0);
   });
 
-  it("marks failures so the user can try again", async () => {
-    const final = await makeOfflineSetup({ files: fakeFiles(0, 30, { fail: true }), model: fakeModel({ failLoad: true }) }).prepare(() => {});
+  it("marks failures so the user can try again, and logs why", async () => {
+    const logged: string[] = [];
+    const final = await makeOfflineSetup({
+      files: fakeFiles(0, 30, { fail: true }),
+      model: fakeModel({ failLoad: true }),
+      logError: (context, e) => logged.push(`${context}: ${(e as Error).message}`),
+    }).prepare(() => {});
     assert.equal(final.files.status, "failed");
     assert.equal(final.guide.status, "failed");
     assert.equal(overallStatus(final), "off");
+    assert.deepEqual(logged, ["Saving app files failed: offline", "Downloading the Gemma guide failed: network"]);
   });
 });

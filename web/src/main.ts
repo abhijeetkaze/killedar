@@ -18,7 +18,10 @@ const audioFiles = () =>
   (audio ??= fetch("./audio/index.json")
     .then((r) => (r.ok ? (r.json() as Promise<string[]>) : []))
     .then((list) => new Set(list))
-    .catch(() => new Set<string>()));
+    .catch((e: unknown) => {
+      console.warn("[Killedar] No narration index; using the phone's voice", e);
+      return new Set<string>();
+    }));
 
 const root = document.getElementById("app");
 if (root) {
@@ -31,10 +34,10 @@ if (root) {
     audioFiles,
   }).catch((e: unknown) => {
     root.textContent = "Killedar couldn't start. Reload the page while online once.";
-    console.error(e);
+    console.error("[Killedar] Couldn't start", e);
   });
 }
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  navigator.serviceWorker.register("./sw.js").catch((e: unknown) => console.warn("Service worker not registered", e));
+  navigator.serviceWorker.register("./sw.js").catch((e: unknown) => console.warn("[Killedar] Service worker not registered", e));
 }

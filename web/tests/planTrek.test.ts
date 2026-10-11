@@ -19,9 +19,15 @@ describe("planTrek", () => {
   });
 
   it("falls back to Naismith when the predictor fails", async () => {
-    const plan = await makePlanTrek({ forts: memoryForts(sampleFort({ verified: true })), predictor: failingPredictor })(req);
+    const logged: unknown[] = [];
+    const plan = await makePlanTrek({
+      forts: memoryForts(sampleFort({ verified: true })),
+      predictor: failingPredictor,
+      logError: (_, e) => logged.push(e),
+    })(req);
     assert.deepEqual(plan.estimate, { minutes: 96, baselineMinutes: 96, source: "naismith" });
     assert.deepEqual(plan.warnings, ["offline-estimate"]);
+    assert.equal(logged.length, 1, "logs why it fell back");
     assert.ok(plan.day);
   });
 

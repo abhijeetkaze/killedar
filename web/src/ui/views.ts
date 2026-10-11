@@ -298,8 +298,10 @@ function speakButton(text: string, lang: Lang): HTMLElement {
 
 class UserFacing extends Error {}
 
+/** Friendly text for the screen; anything unexpected also goes to the console with its stack. */
 function errorText(e: unknown): string {
   if (e instanceof UserFacing || e instanceof EmptyQuestionError) return e.message;
+  console.error("[Killedar]", e);
   if (e instanceof RangeError) return e.message;
   return "Something went wrong. Try again.";
 }

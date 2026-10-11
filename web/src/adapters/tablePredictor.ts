@@ -12,7 +12,7 @@ export function tablePredictor(url: string, doFetch: FetchLike = defaultFetch): 
     (table ??= doFetch(url)
       .then(async (res) => (res.ok ? parsePredictionTable(await res.json()) : null))
       .catch((e: unknown) => {
-        console.warn("No climb-time predictions; using the rule of thumb", e);
+        console.warn("[Killedar] No climb-time predictions; using the rule of thumb", e);
         return null;
       })
       .then((t) => {

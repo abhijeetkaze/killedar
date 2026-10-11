@@ -78,8 +78,9 @@ export function webllmModel(moduleUrl: string = WEBLLM_URL): LanguageModel {
       try {
         const m = await loadLib();
         return await m.hasModelInCache(await chooseModel());
-      } catch {
-        return false; // offline before the module was ever cached
+      } catch (e) {
+        console.warn("[Killedar] Couldn't check for a saved Gemma guide (offline before WebLLM was cached?)", e);
+        return false;
       }
     },
 
@@ -91,7 +92,10 @@ export function webllmModel(moduleUrl: string = WEBLLM_URL): LanguageModel {
           initProgressCallback: (r) => onProgress({ fraction: r.progress, text: r.text }),
         });
       })();
-      engine.catch(() => (engine = null)); // allow retry after a failed download
+      engine.catch((e: unknown) => {
+        console.error("[Killedar] Loading Gemma failed", e);
+        engine = null; // allow retry after a failed download
+      });
       return engine.then(() => undefined);
     },
 

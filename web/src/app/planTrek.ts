@@ -29,9 +29,12 @@ export interface TrekPlan {
 export interface PlanTrekDeps {
   forts: FortRepository;
   predictor: ClimbPredictor;
+  logError?: (context: string, error: unknown) => void;
 }
 
-export function makePlanTrek({ forts, predictor }: PlanTrekDeps) {
+const consoleError = (context: string, error: unknown) => console.error(`[Killedar] ${context}`, error);
+
+export function makePlanTrek({ forts, predictor, logError = consoleError }: PlanTrekDeps) {
   return async function planTrek(req: PlanRequest): Promise<TrekPlan> {
     const fort = await forts.get(req.fortId);
     const trail = fort.trails[req.trailIndex];
@@ -46,7 +49,7 @@ export function makePlanTrek({ forts, predictor }: PlanTrekDeps) {
       startHour: req.startHour,
       groupSize: req.groupSize,
     };
-    const estimate = await estimateOrFallback(predictor, input, warnings);
+    const estimate = await estimateOrFallback(predictor, input, warnings, logError);
 
     const lastDeparture = req.lastDepartureOverride?.trim() || fort.returnTransport.lastDepartureFromBase;
     let day: DayPlan | null = null;
@@ -72,10 +75,12 @@ async function estimateOrFallback(
   predictor: ClimbPredictor,
   input: ClimbInput,
   warnings: PlanWarning[],
+  logError: (context: string, error: unknown) => void,
 ): Promise<ClimbEstimate> {
   try {
     return await predictor.predict(input);
-  } catch {
+  } catch (e) {
+    logError("Climb-time prediction failed; using the rule of thumb", e);
     warnings.push("offline-estimate");
     const minutes = naismithMinutes(input.distanceKm, input.elevationGainM);
     return { minutes, baselineMinutes: minutes, source: "naismith" };
