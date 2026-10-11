@@ -1,47 +1,47 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { fetchFortRepository } from "../src/adapters/fetchFortRepository.ts";
-import { httpClimbPredictor, PredictionError } from "../src/adapters/httpClimbPredictor.ts";
-import { naismithPredictor } from "../src/adapters/naismithPredictor.ts";
+import { tablePredictor } from "../src/adapters/tablePredictor.ts";
 import type { FetchLike } from "../src/adapters/http.ts";
 import { FortValidationError } from "../src/domain/fort.ts";
 import { FortNotFoundError } from "../src/ports/fortRepository.ts";
-import { jsonResponse, sampleFort } from "./fixtures.ts";
+import { jsonResponse, sampleFort, sampleTable } from "./fixtures.ts";
 
 const input = { distanceKm: 3, elevationGainM: 600, startHour: 7, groupSize: 2 };
 
-describe("httpClimbPredictor", () => {
-  it("posts snake_case features and maps the response", async () => {
-    const seen: { url: string; body: unknown }[] = [];
-    const fetch: FetchLike = async (url, init) => {
-      seen.push({ url, body: JSON.parse(String(init?.body)) });
-      return jsonResponse({ minutes: 112.4, baseline_minutes: 96, model: "tabpfn" });
+describe("tablePredictor", () => {
+  const serving = (body: unknown, status = 200) => {
+    const calls: string[] = [];
+    const fetch: FetchLike = async (url) => {
+      calls.push(url);
+      return jsonResponse(body, status);
     };
-    const est = await httpClimbPredictor({ baseUrl: "https://api.test/", fetch }).predict(input);
-    assert.deepEqual(est, { minutes: 112, baselineMinutes: 96, source: "tabpfn" });
-    assert.equal(seen[0]?.url, "https://api.test/predict");
-    assert.deepEqual(seen[0]?.body, { distance_km: 3, elevation_gain_m: 600, start_hour: 7, group_size: 2 });
+    return { calls, fetch };
+  };
+
+  it("answers from TabPFN's table, with Naismith alongside", async () => {
+    const { calls, fetch } = serving(sampleTable());
+    const predictor = tablePredictor("./predictions.json", fetch);
+    assert.deepEqual(await predictor.predict(input), { minutes: 172, baselineMinutes: 96, source: "tabpfn" });
+    await predictor.predict(input);
+    assert.deepEqual(calls, ["./predictions.json"], "loads the table once");
   });
 
-  it("raises on HTTP errors and malformed bodies", async () => {
-    const p500 = httpClimbPredictor({ baseUrl: "x", fetch: async () => jsonResponse({}, 500) });
-    await assert.rejects(p500.predict(input), PredictionError);
-    const bad = httpClimbPredictor({ baseUrl: "x", fetch: async () => jsonResponse({ minutes: -1, baseline_minutes: 1, model: "tabpfn" }) });
-    await assert.rejects(bad.predict(input), /Malformed/);
-    const unknownModel = httpClimbPredictor({ baseUrl: "x", fetch: async () => jsonResponse({ minutes: 9, baseline_minutes: 1, model: "gpt" }) });
-    await assert.rejects(unknownModel.predict(input), /Malformed/);
+  it("uses the rule of thumb outside the table", async () => {
+    const predictor = tablePredictor("x", serving(sampleTable()).fetch);
+    assert.deepEqual(await predictor.predict({ ...input, startHour: 13 }), { minutes: 96, baselineMinutes: 96, source: "naismith" });
   });
 
-  it("aborts slow requests", async () => {
-    const hang: FetchLike = (_u, init) =>
-      new Promise((_, reject) => init?.signal?.addEventListener("abort", () => reject(new Error("aborted"))));
-    await assert.rejects(httpClimbPredictor({ baseUrl: "x", fetch: hang, timeoutMs: 10 }).predict(input), /aborted/);
-  });
-});
-
-describe("naismithPredictor", () => {
-  it("returns the rule-of-thumb estimate", async () => {
-    assert.deepEqual(await naismithPredictor.predict(input), { minutes: 96, baselineMinutes: 96, source: "naismith" });
+  it("uses the rule of thumb when the table is missing or broken, and retries later", async () => {
+    const missing = serving({}, 404);
+    const predictor = tablePredictor("x", missing.fetch);
+    assert.equal((await predictor.predict(input)).source, "naismith");
+    await predictor.predict(input);
+    assert.equal(missing.calls.length, 2);
+    const broken = tablePredictor("x", serving({ model: "tabpfn" }).fetch);
+    assert.equal((await broken.predict(input)).source, "naismith");
+    const offline = tablePredictor("x", async () => Promise.reject(new TypeError("Failed to fetch")));
+    assert.equal((await offline.predict(input)).source, "naismith");
   });
 });
 

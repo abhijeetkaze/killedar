@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseFort } from "../src/domain/fort.ts";
+import { lookupMinutes, parsePredictionTable } from "../src/domain/predictions.ts";
 import { buildAskMessages } from "../src/domain/prompt.ts";
 
 const dir = join(import.meta.dirname, "..", "public", "forts");
@@ -49,6 +50,23 @@ describe("shipped fort data", () => {
       const fort = parseFort(read(`${e.id}.json`));
       assert.equal(e.name, fort.name);
       assert.equal(e.nameMr, fort.nameMr);
+    }
+  });
+});
+
+describe("shipped predictions.json", () => {
+  const table = parsePredictionTable(JSON.parse(readFileSync(join(dir, "..", "predictions.json"), "utf8")));
+
+  it("covers every trail at the Plan screen's start hours (4–14) and group sizes (1–30)", () => {
+    for (const file of fortFiles) {
+      for (const trail of parseFort(read(file)).trails) {
+        for (const climb of [
+          { ...trail, startHour: 4, groupSize: 1 },
+          { ...trail, startHour: 14, groupSize: 30 },
+        ]) {
+          assert.ok(lookupMinutes(table, climb), `${file} ${trail.name} @${climb.startHour}h ×${climb.groupSize}`);
+        }
+      }
     }
   });
 });

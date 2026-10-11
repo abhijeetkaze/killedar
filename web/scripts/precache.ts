@@ -32,10 +32,3 @@ export function renderServiceWorker(template: string, version: string, precache:
 export function audioIndex(files: readonly string[]): string[] {
   return files.filter((f) => /^[a-z0-9-]+-(en|mr)\.mp3$/.test(f)).sort();
 }
-
-export function injectApiUrl(html: string, apiUrl: string): string {
-  if (apiUrl && !/^https:\/\/[^\s"'<>]+$/.test(apiUrl) && !/^http:\/\/localhost(:\d+)?$/.test(apiUrl)) {
-    throw new Error(`KILLEDAR_API_URL must be an https URL (or http://localhost), got "${apiUrl}"`);
-  }
-  return html.replace("%KILLEDAR_API_URL%", apiUrl);
-}

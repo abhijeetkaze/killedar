@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { audioIndex, buildVersion, injectApiUrl, precacheList, renderServiceWorker } from "../scripts/precache.ts";
+import { audioIndex, buildVersion, precacheList, renderServiceWorker } from "../scripts/precache.ts";
 
 describe("precacheList", () => {
   it("includes the start URL and shipped files, sorted, without maps or the worker itself", () => {
@@ -44,18 +44,5 @@ describe("audioIndex", () => {
       "rajgad-mr.mp3",
       "sinhagad-en.mp3",
     ]);
-  });
-});
-
-describe("injectApiUrl", () => {
-  const html = '<meta name="killedar-api" content="%KILLEDAR_API_URL%" />';
-  it("injects https URLs and allows empty", () => {
-    assert.match(injectApiUrl(html, "https://api.example.com"), /content="https:\/\/api\.example\.com"/);
-    assert.match(injectApiUrl(html, ""), /content=""/);
-    assert.match(injectApiUrl(html, "http://localhost:8000"), /localhost:8000/);
-  });
-  it("rejects anything that could break out of the attribute", () => {
-    assert.throws(() => injectApiUrl(html, 'https://x" onload="alert(1)'), /KILLEDAR_API_URL/);
-    assert.throws(() => injectApiUrl(html, "http://api.example.com"), /https/);
   });
 });

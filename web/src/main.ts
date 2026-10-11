@@ -1,18 +1,14 @@
 // Composition root: the only place adapters are chosen and wired to use cases.
 
 import { fetchFortRepository } from "./adapters/fetchFortRepository.ts";
-import { httpClimbPredictor } from "./adapters/httpClimbPredictor.ts";
-import { naismithPredictor } from "./adapters/naismithPredictor.ts";
+import { tablePredictor } from "./adapters/tablePredictor.ts";
 import { webllmModel } from "./adapters/webllmModel.ts";
 import { makeAskFort } from "./app/askFort.ts";
 import { makePlanTrek } from "./app/planTrek.ts";
 import { mountApp } from "./ui/views.ts";
 
-/** Set at build time from KILLEDAR_API_URL; empty means "no prediction service, use the rule of thumb". */
-const apiUrl = document.querySelector<HTMLMetaElement>('meta[name="killedar-api"]')?.content.trim() ?? "";
-
 const forts = fetchFortRepository("./forts/");
-const predictor = apiUrl ? httpClimbPredictor({ baseUrl: apiUrl }) : naismithPredictor;
+const predictor = tablePredictor("./predictions.json");
 const model = webllmModel();
 
 let audio: Promise<Set<string>> | null = null;

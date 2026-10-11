@@ -7,7 +7,7 @@ import type { ClimbEstimate } from "../ports/climbPredictor.ts";
 export function warningText(w: PlanWarning): string {
   switch (w) {
     case "offline-estimate":
-      return "Couldn't reach the prediction service, so the climb time uses the rule of thumb.";
+      return "Couldn't work out your personal climb time, so it uses the rule of thumb.";
     case "unknown-last-departure":
       return "Enter the last bus or train back from the base to get a leave-by time.";
     case "does-not-fit":

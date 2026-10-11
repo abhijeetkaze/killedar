@@ -18,7 +18,7 @@ describe("planTrek", () => {
     assert.deepEqual(plan.warnings, ["unverified-data"]);
   });
 
-  it("falls back to Naismith when the predictor is unreachable", async () => {
+  it("falls back to Naismith when the predictor fails", async () => {
     const plan = await makePlanTrek({ forts: memoryForts(sampleFort({ verified: true })), predictor: failingPredictor })(req);
     assert.deepEqual(plan.estimate, { minutes: 96, baselineMinutes: 96, source: "naismith" });
     assert.deepEqual(plan.warnings, ["offline-estimate"]);

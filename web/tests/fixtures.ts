@@ -92,3 +92,17 @@ export async function collect(it: AsyncIterable<string>): Promise<string> {
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 }
+
+/** Hours 6–8 × groups 1–2 for a 3 km / 600 m trail: 100 + hour × 10 + group. */
+export function sampleTable(): unknown {
+  return {
+    model: "tabpfn",
+    hikes: 25,
+    startHours: [6, 8],
+    groupSizes: [1, 2],
+    trails: [
+      { distanceKm: 3, elevationGainM: 600, minutes: [[161, 162], [171, 172], [181, 182]] },
+      { distanceKm: 2.7, elevationGainM: 600, minutes: [[1, 2], [3, 4], [5, 6]] },
+    ],
+  };
+}

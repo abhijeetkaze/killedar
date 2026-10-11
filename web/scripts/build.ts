@@ -1,10 +1,9 @@
 // Build: tsc → dist/js, copy static files, generate audio index + service worker.
-// Usage: KILLEDAR_API_URL=https://killedar-api.onrender.com node scripts/build.ts
 
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { audioIndex, buildVersion, injectApiUrl, precacheList, renderServiceWorker } from "./precache.ts";
+import { audioIndex, buildVersion, precacheList, renderServiceWorker } from "./precache.ts";
 
 const root = join(import.meta.dirname, "..");
 const dist = join(root, "dist");
@@ -14,10 +13,7 @@ rmSync(dist, { recursive: true, force: true });
 execFileSync(tsc, ["-p", join(root, "tsconfig.build.json")], { stdio: "inherit" });
 
 cpSync(join(root, "public"), dist, { recursive: true });
-writeFileSync(
-  join(dist, "index.html"),
-  injectApiUrl(readFileSync(join(root, "index.html"), "utf8"), process.env.KILLEDAR_API_URL?.trim() ?? ""),
-);
+copyFileSync(join(root, "index.html"), join(dist, "index.html"));
 
 const audioDir = join(dist, "audio");
 const audio = existsSync(audioDir) ? audioIndex(readdirSync(audioDir)) : [];

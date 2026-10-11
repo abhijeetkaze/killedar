@@ -67,7 +67,7 @@ export function makePlanTrek({ forts, predictor }: PlanTrekDeps) {
   };
 }
 
-/** The prediction service is online-only; on the trail we fall back to the rule of thumb. */
+/** If the predictor fails, plan with the rule of thumb rather than not at all. */
 async function estimateOrFallback(
   predictor: ClimbPredictor,
   input: ClimbInput,
