@@ -70,7 +70,8 @@ api/killedar_api/
   evaluation.py        leave-one-out TabPFN vs Naismith
   app.py               create_app(model) — routes only, no wiring
   main.py              composition root (TabPFN if installed + enough hikes, else Naismith)
-api/data/hikes.sample.csv  SYNTHETIC (make_sample.py) — your real hikes go in data/hikes.csv
+api/data/hikes.sample.csv  SYNTHETIC (make_sample.py) — tests/CI
+api/data/hikes.csv         SYNTHETIC placeholder (make_sample.py --trails) — replace with real hikes
 api/tests/
 ```
 
