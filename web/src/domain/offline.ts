@@ -3,7 +3,8 @@
 
 export type StepId = "files" | "guide";
 
-export type StepStatus = "missing" | "working" | "done" | "unsupported" | "failed";
+/** "no-space": the browser refused to store more (phone full, or a private/incognito window). */
+export type StepStatus = "missing" | "working" | "done" | "unsupported" | "failed" | "no-space";
 
 export interface OfflineStep {
   id: StepId;
@@ -45,6 +46,20 @@ export function overallFraction(r: OfflineReport): number {
   const fileWeight = guideCounts ? 0.02 : 1;
   const done = (s: OfflineStep) => (s.status === "done" ? 1 : clamp01(s.fraction));
   return clamp01(fileWeight * done(r.files) + (guideCounts ? (1 - fileWeight) * done(r.guide) : 0));
+}
+
+/** True for the browser's "storage full" error, however the library wrapped it. */
+export function isNoSpaceError(e: unknown): boolean {
+  for (let cur = e, depth = 0; cur && depth < 4; cur = (cur as { cause?: unknown }).cause, depth++) {
+    const { name, message } = cur as { name?: unknown; message?: unknown };
+    if (name === "QuotaExceededError" || (typeof message === "string" && /quota/i.test(message))) return true;
+  }
+  return false;
+}
+
+/** WebLLM's progress line, without its trailing advice: "Fetching param cache[26/42]: 720MB fetched. 51% completed". */
+export function shortProgressText(text: string): string {
+  return text.split(/,? \d+ secs? elapsed| It can take/)[0]?.trim() ?? text;
 }
 
 export function step(id: StepId, status: StepStatus, fraction = status === "done" ? 1 : 0, detail = ""): OfflineStep {

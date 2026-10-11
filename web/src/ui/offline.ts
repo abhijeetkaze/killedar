@@ -78,7 +78,7 @@ export function offlineControls(setup: OfflineSetup): OfflineControls {
     replace(summary, overall === "ready" ? iconSpan(ICONS.ready) : null, offlineSummaryText(overall));
     replace(steps, ...(report ? [stepItem(report.files), stepItem(report.guide)] : []));
 
-    const failed = report && (report.files.status === "failed" || report.guide.status === "failed");
+    const failed = report && [report.files.status, report.guide.status].some((s) => s === "failed" || s === "no-space");
     go.hidden = overall === "ready";
     go.disabled = running || !report;
     go.textContent = running ? "Downloading…" : failed ? "Try again" : "Download for offline";
@@ -96,7 +96,15 @@ export function offlineControls(setup: OfflineSetup): OfflineControls {
 
 function stepItem(s: OfflineStep): HTMLElement {
   const icon: IconName | null =
-    s.status === "done" ? "ready" : s.status === "unsupported" ? "blocked" : s.status === "failed" ? "alert" : s.status === "missing" ? "todo" : null;
+    s.status === "done"
+      ? "ready"
+      : s.status === "unsupported"
+        ? "blocked"
+        : s.status === "failed" || s.status === "no-space"
+          ? "alert"
+          : s.status === "missing"
+            ? "todo"
+            : null;
   return h(
     "li",
     { class: s.status },

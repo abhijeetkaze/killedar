@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { makeOfflineSetup } from "../src/app/offlineSetup.ts";
-import { overallFraction, overallStatus, step, type OfflineReport } from "../src/domain/offline.ts";
+import { isNoSpaceError, overallFraction, overallStatus, shortProgressText, step, type OfflineReport } from "../src/domain/offline.ts";
 import { fakeFiles, fakeModel } from "./fixtures.ts";
 
 const report = (files: OfflineReport["files"], guide: OfflineReport["guide"]): OfflineReport => ({ files, guide });
@@ -91,5 +91,42 @@ describe("offlineSetup", () => {
     assert.equal(final.guide.status, "failed");
     assert.equal(overallStatus(final), "off");
     assert.deepEqual(logged, ["Saving app files failed: offline", "Downloading the Gemma guide failed: network"]);
+  });
+
+  it("reports a full phone as no-space, not a generic failure", async () => {
+    const quota = new DOMException("Quota exceeded.", "QuotaExceededError");
+    const final = await makeOfflineSetup({ files: fakeFiles(30, 30), model: fakeModel({ failLoad: quota }), logError: () => {} }).prepare(() => {});
+    assert.equal(final.guide.status, "no-space");
+  });
+
+  it("ignores progress that arrives after the download failed", async () => {
+    const updates: OfflineReport[] = [];
+    const model = fakeModel({ failLoad: true, progressAfterFailure: true });
+    const final = await makeOfflineSetup({ files: fakeFiles(30, 30), model, logError: () => {} }).prepare((r) => updates.push(r));
+    await new Promise((r) => setTimeout(r, 5));
+    assert.equal(final.guide.status, "failed");
+    assert.equal(updates.at(-1)?.guide.status, "failed", "no 'working' update after the failure");
+  });
+});
+
+describe("isNoSpaceError", () => {
+  it("spots the browser's quota error, even wrapped", () => {
+    assert.ok(isNoSpaceError(new DOMException("Quota exceeded.", "QuotaExceededError")));
+    assert.ok(isNoSpaceError(new Error("Failed to cache shard", { cause: new DOMException("x", "QuotaExceededError") })));
+    assert.ok(isNoSpaceError(new Error("Storage quota has been exceeded")));
+    assert.ok(!isNoSpaceError(new TypeError("Failed to fetch")));
+    assert.ok(!isNoSpaceError(undefined));
+  });
+});
+
+describe("shortProgressText", () => {
+  it("drops WebLLM's elapsed time and advice", () => {
+    assert.equal(
+      shortProgressText(
+        "Fetching param cache[26/42]: 720MB fetched. 51% completed, 49 secs elapsed. It can take a while when we first visit this page to populate the cache.",
+      ),
+      "Fetching param cache[26/42]: 720MB fetched. 51% completed",
+    );
+    assert.equal(shortProgressText("Start to fetch params"), "Start to fetch params");
   });
 });

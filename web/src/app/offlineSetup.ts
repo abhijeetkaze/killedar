@@ -1,6 +1,6 @@
 // Use case: "Get everything onto this phone so the app works on the fort with no signal."
 
-import { step, type OfflineReport } from "../domain/offline.ts";
+import { isNoSpaceError, shortProgressText, step, type OfflineReport } from "../domain/offline.ts";
 import type { LanguageModel } from "../ports/languageModel.ts";
 import type { OfflineFiles } from "../ports/offlineFiles.ts";
 
@@ -46,23 +46,28 @@ export function makeOfflineSetup({ files, model, logError = consoleError }: Offl
         report.files = step("files", "done");
       } catch (e) {
         logError("Saving app files failed", e);
-        report.files = step("files", "failed");
+        report.files = step("files", isNoSpaceError(e) ? "no-space" : "failed");
       }
       emit();
     }
 
-    if (report.guide.status === "missing" || report.guide.status === "failed") {
+    if (report.guide.status !== "done" && report.guide.status !== "unsupported") {
       report.guide = step("guide", "working");
       emit();
+      // WebLLM keeps reporting progress from in-flight fetches after it has failed; ignore those.
+      let settled = false;
       try {
         await model.load((p) => {
-          report.guide = step("guide", "working", p.fraction, p.text);
+          if (settled) return;
+          report.guide = step("guide", "working", p.fraction, shortProgressText(p.text));
           emit();
         });
+        settled = true;
         report.guide = step("guide", "done", 1, model.modelName);
       } catch (e) {
+        settled = true;
         logError("Downloading the Gemma guide failed", e);
-        report.guide = step("guide", "failed");
+        report.guide = step("guide", isNoSpaceError(e) ? "no-space" : "failed");
       }
       emit();
     }

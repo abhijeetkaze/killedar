@@ -223,7 +223,7 @@ button:disabled { opacity: 0.55; cursor: progress; }
 .offline-steps li > div { display: grid; gap: 4px; min-width: 0; }
 .offline-steps .small { color: var(--lichen); overflow-wrap: anywhere; }
 .offline-steps .done .icon, .offline-steps .working .icon { color: var(--moss); }
-.offline-steps .failed .icon, .offline-steps .unsupported .icon { color: var(--warn); }
+.offline-steps .failed .icon, .offline-steps .no-space .icon, .offline-steps .unsupported .icon { color: var(--warn); }
 .offline-actions { display: grid; gap: 8px; }
 progress { width: 100%; height: 8px; accent-color: var(--moss); }
 

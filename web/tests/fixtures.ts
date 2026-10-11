@@ -128,7 +128,9 @@ export function fakeFiles(stored: number, total: number, opts: { fail?: boolean 
 }
 
 /** Fake on-device model with a controllable cache, support and download. */
-export function fakeModel(opts: { cached?: boolean; support?: Support; failLoad?: boolean } = {}): LanguageModel & { loads: number } {
+export function fakeModel(
+  opts: { cached?: boolean; support?: Support; failLoad?: boolean | Error; progressAfterFailure?: boolean } = {},
+): LanguageModel & { loads: number } {
   let cached = opts.cached ?? false;
   const model = {
     loads: 0,
@@ -141,7 +143,11 @@ export function fakeModel(opts: { cached?: boolean; support?: Support; failLoad?
     },
     async load(onProgress: (p: LoadProgress) => void) {
       model.loads++;
-      if (opts.failLoad) throw new Error("network");
+      if (opts.failLoad) {
+        // like WebLLM: in-flight shard fetches still report progress after the load has rejected
+        if (opts.progressAfterFailure) setTimeout(() => onProgress({ fraction: 0.52, text: "late" }), 0);
+        throw opts.failLoad instanceof Error ? opts.failLoad : new Error("network");
+      }
       onProgress({ fraction: 0.5, text: "Fetching weights 50%" });
       cached = true;
     },
