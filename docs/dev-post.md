@@ -8,6 +8,8 @@ tags: devchallenge, hf26challenge, opensource, ai
 
 ## What I Built
 
+**Try it:** [killedar.onrender.com](https://killedar.onrender.com) · **Code:** [github.com/abhijeetkaze/killedar](https://github.com/abhijeetkaze/killedar)
+
 Halfway up Rajgad the bars on your phone go one by one. By Padmavati Machi you're carrying a very expensive torch.
 
 That's the problem with every AI trek assistant I could imagine building on a hosted API: it works in Pune and stops working at the trailhead, which is exactly where you need it.
@@ -34,6 +36,8 @@ On Wi-Fi at home you tap **Use offline** once. Killedar saves the app, the fort 
 ## Code
 
 {% github abhijeetkaze/killedar %}
+
+Repository: [github.com/abhijeetkaze/killedar](https://github.com/abhijeetkaze/killedar)
 
 A static PWA, plus a little Python that runs on my laptop. **There is no backend.** Both halves are ports-and-adapters with a pure domain at the centre:
 
