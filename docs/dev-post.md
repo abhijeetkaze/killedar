@@ -94,15 +94,21 @@ python -m killedar_api.precompute data/hikes.csv   # → web/public/predictions.
 
 The app ships that file and the service worker caches it. The Plan screen looks up the predicted climb time in about 20 ms, online or on the summit, and anything outside the table falls back to Naismith. TabPFN still does the learning; the phone just reads its answers.
 
+![Plan for Rajgad: leave-by time worked back from the last bus, with TabPFN's predicted climb time](https://raw.githubusercontent.com/abhijeetkaze/killedar/main/docs/screenshots/plan.png)
+
 ### Narration with ElevenLabs
 
 The Listen screen plays each fort's history in English and in Marathi, narrated by ElevenLabs. The narration is generated **once, at build time**, by [`web/scripts/generate-audio.ts`](https://github.com/abhijeetkaze/killedar/blob/main/web/scripts/generate-audio.ts): it sends each history to the ElevenLabs text-to-speech API and writes the MP3s into the app. Six clips, 1.4 MB in all, saved for offline with everything else. On the fort they play with no signal and no API key.
 
 Marathi was the catch. The usual `eleven_multilingual_v2` model rejects it outright (`does not support language_code 'mr'`), so the script uses **`eleven_v3`** and sends each clip's language code, which means the Marathi history is read as Marathi.
 
+![Listen: ElevenLabs narration of Rajgad's history in Marathi, playable offline](https://raw.githubusercontent.com/abhijeetkaze/killedar/main/docs/screenshots/listen.png)
+
 ### Offline setup you can see
 
 A **Use offline** button in the header opens a short checklist: the app files first (about 2 MB: shell, fort notes, climb-time table, narration), then the Gemma model (about 1.5 GB). Each step has its own progress bar, the button becomes a progress ring, and it turns into a green **Offline ready** check when everything is on the phone. If the phone runs out of storage, it says so plainly. If the browser has no WebGPU, Plan and Listen still go offline and the checklist says why Ask can't.
+
+![Offline setup: app files saved, Gemma downloading with progress](https://raw.githubusercontent.com/abhijeetkaze/killedar/main/docs/screenshots/offline-setup.png)
 
 ### Facts about real places
 
