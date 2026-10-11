@@ -28,6 +28,8 @@ On Wi-Fi at home you tap **Use offline** once. Killedar saves the app, the fort 
 
 ## Demo
 
+{% embed https://youtu.be/hglUKJcHEcU %}
+
 **Live app: [killedar.onrender.com](https://killedar.onrender.com)**. Open it on your phone, tap **Use offline**, then try it in airplane mode. Plan and Listen work in any modern browser. Ask needs WebGPU: Chrome on Android, or desktop Chrome with a supported GPU.
 
 ![Killedar on a phone: Plan, offline setup, Listen](https://raw.githubusercontent.com/abhijeetkaze/killedar/main/docs/screenshots/killedar-screens.png)

@@ -9,6 +9,12 @@ phone away. On the fort, with no signal, ask questions and hear the fort's story
 Built for the [DEV Hacktoberfest 2026 Open-Source AI Challenge, Week 1: Touch Grass](https://dev.to/challenges/hacktoberfest-week1-2026-10-05).
 Repository started **2026-10-10**.
 
+## Demo
+
+[![Watch the Killedar demo on YouTube](https://img.youtube.com/vi/hglUKJcHEcU/maxresdefault.jpg)](https://youtu.be/hglUKJcHEcU)
+
+▶ **[Watch the demo on YouTube](https://youtu.be/hglUKJcHEcU)** · **Live app: [killedar.onrender.com](https://killedar.onrender.com)**
+
 ## What it does
 
 | Screen | Works offline | What happens |
