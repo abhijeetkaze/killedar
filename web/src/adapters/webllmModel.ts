@@ -4,7 +4,7 @@
 // online "Download" it runs in airplane mode.
 
 import type { ChatMessage } from "../domain/chat.ts";
-import { pickGemmaModel } from "../domain/model.ts";
+import { gemmaChatOptions, pickGemmaModel, type GemmaChatOptions } from "../domain/model.ts";
 import type { LanguageModel, LoadProgress, Support } from "../ports/languageModel.ts";
 
 /** Pinned major so a breaking WebLLM release can't change behaviour under us. */
@@ -29,6 +29,7 @@ interface WebLlmModule {
   CreateMLCEngine(
     modelId: string,
     cfg: { initProgressCallback: (r: { progress: number; text: string }) => void },
+    chatOpts?: GemmaChatOptions,
   ): Promise<WebLlmEngine>;
 }
 
@@ -88,9 +89,11 @@ export function webllmModel(moduleUrl: string = WEBLLM_URL): LanguageModel {
       engine ??= (async () => {
         const m = await loadLib();
         const id = await chooseModel();
-        return m.CreateMLCEngine(id, {
-          initProgressCallback: (r) => onProgress({ fraction: r.progress, text: r.text }),
-        });
+        return m.CreateMLCEngine(
+          id,
+          { initProgressCallback: (r) => onProgress({ fraction: r.progress, text: r.text }) },
+          gemmaChatOptions(id),
+        );
       })();
       engine.catch((e: unknown) => {
         console.error("[Killedar] Loading Gemma failed", e);

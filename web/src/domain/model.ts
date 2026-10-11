@@ -46,3 +46,22 @@ export function pickGemmaModel(availableIds: readonly string[], opts: PickOption
   });
   return candidates[0]?.id ?? null;
 }
+
+export interface GemmaChatOptions {
+  context_window_size: number;
+  sliding_window_size: number;
+}
+
+/** Context window we ask for: room for the fort notes, a question and a short answer. */
+export const CONTEXT_TOKENS = 4096;
+
+/**
+ * Engine options WebLLM merges over the model's mlc-chat-config.json. Gemma 3's config sets both a
+ * context window and a 512-token sliding window, and WebLLM 0.2 refuses to load when both are
+ * positive (WindowSizeConfigurationError). The 512 is Gemma 3's per-layer local attention, which the
+ * compiled model reads from its own model_config; the engine-level KV cache needs only the context
+ * window, so switch the engine-level sliding window off.
+ */
+export function gemmaChatOptions(modelId: string): GemmaChatOptions {
+  return { context_window_size: /-1k$/i.test(modelId) ? 1024 : CONTEXT_TOKENS, sliding_window_size: -1 };
+}

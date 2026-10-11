@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { describeGemma, pickGemmaModel } from "../src/domain/model.ts";
+import { describeGemma, gemmaChatOptions, pickGemmaModel } from "../src/domain/model.ts";
 
 describe("describeGemma", () => {
   it("parses generation and size", () => {
@@ -47,5 +47,17 @@ describe("pickGemmaModel", () => {
 
   it("returns null when no Gemma is listed", () => {
     assert.equal(pickGemmaModel(["Llama-3.2-1B-Instruct-q4f16_1-MLC"]), null);
+  });
+});
+
+describe("gemmaChatOptions", () => {
+  it("asks for a full context window and switches the engine-level sliding window off", () => {
+    // WebLLM 0.2 rejects gemma3-1b when both are positive (its config has 8192 and 512).
+    assert.deepEqual(gemmaChatOptions("gemma3-1b-it-q4f16_1-MLC"), { context_window_size: 4096, sliding_window_size: -1 });
+    assert.deepEqual(gemmaChatOptions("gemma-2-2b-it-q4f32_1-MLC"), { context_window_size: 4096, sliding_window_size: -1 });
+  });
+
+  it("keeps the -1k builds at the 1,024 tokens they were compiled for", () => {
+    assert.equal(gemmaChatOptions("gemma-2-2b-it-q4f16_1-MLC-1k").context_window_size, 1024);
   });
 });
