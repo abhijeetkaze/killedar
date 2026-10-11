@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 from killedar_api.adapters.csv_hikes import HikeFileError, load_hikes
-from killedar_api.adapters.tabpfn_model import MIN_HIKES
+from killedar_api.precompute import MIN_HIKES
 
 SAMPLE = Path(__file__).resolve().parent.parent / "data" / "hikes.sample.csv"
 HEADER = "distance_km,elevation_gain_m,start_hour,group_size,duration_min\n"

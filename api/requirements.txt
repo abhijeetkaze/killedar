@@ -1,5 +1,3 @@
-starlette>=0.40
-uvicorn[standard]>=0.30
 pydantic>=2.7
 --extra-index-url https://download.pytorch.org/whl/cpu   # CPU-only torch: ~200 MB, not 3 GB of CUDA
 tabpfn>=9.0    # pulls in torch; first fit downloads the open v2 weights from Hugging Face

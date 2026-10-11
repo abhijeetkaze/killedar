@@ -2,13 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Literal
-
 from pydantic import BaseModel, ConfigDict, Field
 
 FEATURES: tuple[str, ...] = ("distance_km", "elevation_gain_m", "start_hour", "group_size")
-
-ModelName = Literal["tabpfn", "naismith"]
 
 
 class HikeFeatures(BaseModel):
@@ -29,12 +25,6 @@ class Hike(HikeFeatures):
     """A past climb with how long it actually took (trailhead to summit)."""
 
     duration_min: float = Field(gt=0, le=24 * 60)
-
-
-class Prediction(BaseModel):
-    minutes: float
-    baseline_minutes: float
-    model: ModelName
 
 
 def naismith_minutes(distance_km: float, elevation_gain_m: float) -> float:

@@ -1,41 +1,11 @@
 import importlib.util
 import unittest
 
-from killedar_api.adapters.naismith_model import NaismithModel
-from killedar_api.adapters.tabpfn_model import MIN_HIKES, NotEnoughHikesError, TabPFNModel
 from killedar_api.evaluation import leave_one_out
 
-from .helpers import ConstantRegressor, features, hikes
+from .helpers import ConstantRegressor, hikes
 
-HAS_TABPFN = importlib.util.find_spec("tabpfn") is not None
 HAS_SKLEARN = importlib.util.find_spec("sklearn") is not None
-
-
-class NaismithModelTest(unittest.TestCase):
-    def test_predicts_rule(self):
-        self.assertEqual(NaismithModel().predict(features()), 96)
-        self.assertEqual(NaismithModel.name, "naismith")
-
-
-class TabPFNModelTest(unittest.TestCase):
-    def test_fits_on_feature_rows_and_durations(self):
-        reg = ConstantRegressor(123.0)
-        data = hikes(MIN_HIKES)
-        model = TabPFNModel(data, make_regressor=lambda: reg)
-        self.assertEqual(model.predict(features()), 123.0)
-        X, y = reg.fitted_on
-        self.assertEqual(X[0], data[0].as_row())
-        self.assertEqual(y, [h.duration_min for h in data])
-
-    def test_needs_enough_hikes(self):
-        with self.assertRaises(NotEnoughHikesError):
-            TabPFNModel(hikes(MIN_HIKES - 1), make_regressor=lambda: ConstantRegressor(1))
-
-    @unittest.skipUnless(HAS_TABPFN, "tabpfn not installed (pip install -r requirements.txt)")
-    def test_real_tabpfn_learns_a_slow_hiker(self):
-        model = TabPFNModel(hikes(30, slow_factor=1.3))
-        predicted = model.predict(features())
-        self.assertAlmostEqual(predicted, 96 * 1.3, delta=20)
 
 
 class EvaluationTest(unittest.TestCase):

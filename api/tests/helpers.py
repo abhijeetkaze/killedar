@@ -35,12 +35,3 @@ class ConstantRegressor:
     def predict(self, X: Sequence[Sequence[float]]) -> list[float]:
         return [self.value for _ in X]
 
-
-class FixedModel:
-    name = "tabpfn"
-
-    def __init__(self, value: float) -> None:
-        self.value = value
-
-    def predict(self, _: HikeFeatures) -> float:
-        return self.value
