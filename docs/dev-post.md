@@ -152,10 +152,11 @@ change and a hallucinated 6:30 p.m. bus is how people end up walking down in the
 
 ### Narration
 
-The Listen screen plays ElevenLabs narration bundled into the app at build time (`npm run audio`),
-so it costs nothing on the fort and needs no signal. Without the audio files it falls back to the
-phone's own speech synthesis.
-<!-- TODO: delete the ElevenLabs sentence (and prize line below) if you didn't generate audio -->
+The Listen screen plays ElevenLabs narration bundled into the app at build time (`npm run audio`):
+each fort's history in English and in Marathi, six clips, 1.4 MB in all. They're precached with the
+app, so they cost nothing on the fort and need no signal. Marathi was the catch: the usual
+`eleven_multilingual_v2` model rejects it outright, so the script uses `eleven_v3` and sends each
+clip's language code. A fort with no clip falls back to the phone's own speech synthesis.
 
 ### Deploy
 
@@ -191,7 +192,7 @@ for climbing them should too.
 - **Best Use of Render**: Render hosts the app's front end, a static site deployed from one
   `render.yaml` blueprint. All the AI runs on the phone.
 - **Best Use of ElevenLabs**: fort histories narrated at build time and bundled offline, so they
-  play on the summit with no signal. <!-- TODO: remove if no audio -->
+  play on the summit with no signal, in English and Marathi (`eleven_v3`).
 
 ---
 

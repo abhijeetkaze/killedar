@@ -80,7 +80,7 @@ climbing the app's real fort trails) — a placeholder until real hikes replace 
 ### Narration
 
 ```bash
-ELEVENLABS_API_KEY=… ELEVENLABS_VOICE_ID=… npm run audio
+ELEVENLABS_API_KEY=… ELEVENLABS_VOICE_ID=… npm run audio   # eleven_v3: the only model that takes Marathi
 ```
 
 ## Fort data

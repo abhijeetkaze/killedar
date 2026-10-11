@@ -53,7 +53,7 @@ export function offlineStepText(s: OfflineStep): string {
     case "working":
       return s.detail || "Starting…";
     case "missing":
-      return s.id === "files" ? "Under 1 MB." : "About 1.5 GB, once. Use Wi-Fi.";
+      return s.id === "files" ? "About 2 MB, including narration." : "About 1.5 GB, once. Use Wi-Fi.";
     case "failed":
       return "Download stopped. Check your connection and try again.";
     case "no-space":

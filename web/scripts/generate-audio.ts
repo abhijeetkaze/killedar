@@ -2,10 +2,9 @@
 // The MP3s ship with the app and are precached, so they play on the fort with no signal.
 //
 //   ELEVENLABS_API_KEY=... ELEVENLABS_VOICE_ID=... npm run audio [-- --force]
-//   optional: ELEVENLABS_MODEL (default eleven_multilingual_v2)
+//   optional: ELEVENLABS_MODEL (default eleven_v3 — eleven_multilingual_v2 rejects Marathi)
 //
-// Check that your chosen model supports Marathi; if it doesn't, delete the *-mr.mp3 files and
-// the app falls back to the phone's own text-to-speech for Marathi.
+// Without a *-mr.mp3 file the app falls back to the phone's own text-to-speech for Marathi.
 
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -14,7 +13,7 @@ import { narrationJobs } from "./narration.ts";
 
 const key = process.env.ELEVENLABS_API_KEY;
 const voice = process.env.ELEVENLABS_VOICE_ID;
-const model = process.env.ELEVENLABS_MODEL ?? "eleven_multilingual_v2";
+const model = process.env.ELEVENLABS_MODEL ?? "eleven_v3";
 const force = process.argv.includes("--force");
 
 if (!key || !voice) {
@@ -36,7 +35,7 @@ for (const file of readdirSync(fortsDir).filter((f) => f.endsWith(".json") && f 
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=mp3_44100_64`, {
       method: "POST",
       headers: { "xi-api-key": key, "content-type": "application/json", accept: "audio/mpeg" },
-      body: JSON.stringify({ text: job.text, model_id: model }),
+      body: JSON.stringify({ text: job.text, model_id: model, language_code: job.lang }),
     });
     if (!res.ok) {
       console.error(`fail ${job.file}: ${res.status} ${await res.text()}`);

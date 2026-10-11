@@ -252,7 +252,11 @@ function listenScreen(fort: Fort, deps: AppDeps, lang: Lang, setLang: (l: Lang) 
   void deps.audioFiles().then((files) => {
     const file = `${fort.id}-${lang}.mp3`;
     if (files.has(file)) {
-      replace(player, h("audio", { controls: true, preload: "auto", src: `audio/${file}` }));
+      replace(
+        player,
+        h("audio", { controls: true, preload: "auto", src: `audio/${file}` }),
+        h("p", { class: "muted small" }, "Narration: ", h("a", { href: "https://elevenlabs.io", rel: "noopener", target: "_blank" }, "ElevenLabs")),
+      );
     } else {
       replace(player, speakButton(paragraphs.join(" "), textLang));
     }
