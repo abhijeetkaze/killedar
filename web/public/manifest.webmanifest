@@ -1,0 +1,11 @@
+{
+  "name": "Killedar — Sahyadri fort companion",
+  "short_name": "Killedar",
+  "description": "Offline trek companion for Sahyadri forts near Pune.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ECEFEA",
+  "theme_color": "#ECEFEA",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -1,0 +1,4 @@
+starlette>=0.40
+uvicorn[standard]>=0.30
+pydantic>=2.7
+tabpfn>=2.0    # pulls in torch; first predict downloads model weights
